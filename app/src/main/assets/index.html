@@ -336,19 +336,20 @@ ul#repos {
   border-right: 1px solid var(--line);
   background: transparent;
   color: var(--ink);
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.76rem;
+  font-weight: 650;
+  padding: 0 4px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
   transition: background 0.15s;
+  white-space: nowrap;
 }
 .act-btn:last-child { border-right: 0; }
 .act-btn:hover, .act-btn:active { background: var(--surface-2); }
-.act-btn.primary-act { color: var(--accent); }
-.act-btn[disabled] { opacity: 0.45; pointer-events: none; }
-.act-btn svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; }
+.act-btn.primary-act { color: var(--accent); font-weight: 700; }
+.act-btn[disabled] { opacity: 0.4; pointer-events: none; }
 
 /* Expanded File List */
 .filelist {
@@ -370,14 +371,14 @@ ul#repos {
   background: var(--accent-soft);
   color: var(--accent);
   border-radius: 6px;
-  padding: 2px 8px;
+  padding: 3px 8px;
   font-size: 0.74rem;
   font-weight: 700;
 }
 .file-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   padding: 4px;
   border-radius: 8px;
   margin-top: 4px;
@@ -395,13 +396,23 @@ ul#repos {
   overflow-wrap: anywhere;
   color: var(--ink);
 }
+.file-ext-btn {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 5px 8px;
+  font-size: 0.74rem;
+  font-weight: 650;
+  flex-shrink: 0;
+}
 .file-edit-btn {
   border: 0;
   border-radius: 6px;
   background: var(--accent-soft);
   color: var(--accent);
   padding: 6px 10px;
-  font-size: 0.76rem;
+  font-size: 0.75rem;
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -425,7 +436,7 @@ ul#repos {
 }
 .vt-wrap {
   flex: 1;
-  min-width: 120px;
+  min-width: 110px;
 }
 #vt {
   display: block;
@@ -436,7 +447,7 @@ ul#repos {
 }
 #vsub {
   display: block;
-  font-size: 0.74rem;
+  font-size: 0.73rem;
   color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
@@ -453,9 +464,9 @@ ul#repos {
   border: 0;
   background: transparent;
   color: var(--muted);
-  padding: 5px 10px;
+  padding: 5px 9px;
   border-radius: 6px;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 650;
 }
 .mode-btn.active {
@@ -464,31 +475,32 @@ ul#repos {
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 .btn-primary {
-  height: 36px;
-  padding: 0 12px;
+  height: 34px;
+  padding: 0 11px;
   border-radius: 9px;
   border: 0;
   background: var(--accent);
   color: var(--on-accent);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 .btn-outline {
-  height: 36px;
+  height: 34px;
   padding: 0 10px;
   border-radius: 9px;
-  border: 1px solid var(--line);
-  background: var(--bg);
-  color: var(--ink);
-  font-size: 0.8rem;
-  font-weight: 600;
+  border: 1px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 /* Workspace Body */
@@ -516,6 +528,7 @@ ul#repos {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--line);
+  gap: 8px;
 }
 #frame {
   flex: 1;
@@ -810,10 +823,10 @@ dialog input {
       </div>
 
       <button class="btn-primary" id="saveCommitBtn" hidden>Save / Commit</button>
-      <button class="ib" id="reload" title="Reload page" aria-label="Reload page" hidden>
+      <button class="ib" id="reload" title="Clear cache & reload page" aria-label="Reload page" hidden>
         <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
       </button>
-      <a class="btn-outline" id="ext" target="_blank" rel="noopener" hidden>Browser ↗</a>
+      <button class="btn-outline" id="extBtn" hidden title="Open site in external browser">Open in Browser ↗</button>
     </div>
 
     <div id="workBody">
@@ -866,9 +879,9 @@ dialog input {
           <span>Instant Local Preview (Unsaved Edits)</span>
           <button class="new-file-btn" id="bannerCommitBtn">Commit to GitHub</button>
         </div>
+        <!-- Unsandboxed iframe so localStorage, IndexedDB, ServiceWorkers, and user progress work 100% natively -->
         <iframe id="frame" title="Page viewer"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads"
-          allow="fullscreen; clipboard-write"></iframe>
+          allow="fullscreen; clipboard-write; autoplay; geolocation"></iframe>
       </section>
 
       <!-- EMPTY STATE -->
@@ -877,7 +890,7 @@ dialog input {
           <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
         </div>
         <h3>View &amp; Edit Your Pages</h3>
-        <p>Select any repository from the list to browse its live GitHub Pages site or edit its HTML files right inside the app.</p>
+        <p>Select any repository from the list to view its live GitHub Pages site, open it in your browser, or edit its HTML directly.</p>
       </div>
     </div>
   </main>
@@ -898,7 +911,7 @@ dialog input {
   </p>
   <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between">
     <div>
-      <div style="font-weight:600;font-size:0.9rem">HotPages <span id="appVerBadge" style="color:var(--accent)">v1.0.2</span></div>
+      <div style="font-weight:600;font-size:0.9rem">HotPages <span id="appVerBadge" style="color:var(--accent)">v1.0.3</span></div>
       <div style="font-size:0.8rem;color:var(--muted)" id="updateStatusText">Checks GitHub for new APK updates</div>
     </div>
     <button type="button" id="checkUpdateBtn" style="font-size:0.85rem;padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface)">Check Updates</button>
@@ -961,8 +974,7 @@ const ed = {
   path: 'index.html',
   sha: null,
   remoteCode: '',
-  dirty: false,
-  loading: false
+  dirty: false
 };
 
 try { repos = JSON.parse(ls.get('ph_repos') || '[]'); } catch (e) {}
@@ -977,6 +989,19 @@ function el(t, a = {}, ...c) {
   }
   n.append(...c);
   return n;
+}
+
+// Reliable Open in External Browser helper (uses Native Android Bridge first)
+function launchExternalBrowser(url) {
+  if (!url) {
+    toast('No live URL available for this repository');
+    return;
+  }
+  if (window.Android && typeof window.Android.openBrowser === 'function') {
+    window.Android.openBrowser(url);
+  } else {
+    window.open(url, '_blank', 'noopener');
+  }
 }
 
 // UTF-8 Safe Base64 Helpers for GitHub API
@@ -1022,7 +1047,7 @@ function hasRepoDraft(rName) {
 async function api(path, opts = {}) {
   const h = { Accept: 'application/vnd.github+json', ...(opts.headers || {}) };
   if (token) h.Authorization = 'Bearer ' + token;
-  const r = await fetch('https://api.github.com' + path, { ...opts, headers: h });
+  const r = await fetch('https://api.github.com' + path, { cache: 'no-store', ...opts, headers: h });
   if (!r.ok) {
     let detail = '';
     try { const j = await r.json(); detail = j.message || ''; } catch (e) {}
@@ -1121,6 +1146,7 @@ function render() {
   list.forEach(r => {
     const hasDraft = hasRepoDraft(r.name);
     const box = el('div', { class: 'filelist', hidden: '' });
+    const repoUrl = siteBase(r);
 
     const badges = el('div', { class: 'badges' },
       hasDraft ? el('span', { class: 'badge draft' }, 'Draft') : '',
@@ -1141,8 +1167,14 @@ function render() {
     const openSiteBtn = el('button', {
       class: 'act-btn primary-act',
       disabled: !r.pages,
-      onclick: () => openPage(r, 'index.html', siteBase(r), r.name)
-    }, 'Open Site');
+      onclick: () => openPage(r, 'index.html', repoUrl, r.name)
+    }, 'Open in App');
+
+    const openBrowserBtn = el('button', {
+      class: 'act-btn',
+      disabled: !r.pages,
+      onclick: () => launchExternalBrowser(repoUrl)
+    }, 'Browser ↗');
 
     const editIndexBtn = el('button', {
       class: 'act-btn',
@@ -1152,9 +1184,9 @@ function render() {
     const filesBtn = el('button', {
       class: 'act-btn',
       onclick: () => toggleFiles(r, box)
-    }, 'HTML Files ▾');
+    }, 'Files ▾');
 
-    const actions = el('div', { class: 'card-actions' }, openSiteBtn, editIndexBtn, filesBtn);
+    const actions = el('div', { class: 'card-actions' }, openSiteBtn, openBrowserBtn, editIndexBtn, filesBtn);
 
     ul.append(
       el('li', {
@@ -1198,6 +1230,11 @@ async function toggleFiles(r, box) {
           class: 'file-open',
           onclick: () => r.pages ? openPage(r, x.path, fUrl, r.name + '/' + x.path) : openEditorForFile(r, x.path)
         }, x.path + (isDraft ? ' (draft)' : '')),
+        r.pages ? el('button', {
+          class: 'file-ext-btn',
+          title: 'Open in external browser',
+          onclick: () => launchExternalBrowser(fUrl)
+        }, '↗') : '',
         el('button', {
           class: 'file-edit-btn',
           onclick: () => openEditorForFile(r, x.path)
@@ -1249,7 +1286,7 @@ function setWorkspaceMode(mode) {
   $('#frameWrap').hidden = !showFrame;
   $('#saveCommitBtn').hidden = !showEditor && mode !== 'preview';
   $('#reload').hidden = mode !== 'view';
-  $('#ext').hidden = !curUrl;
+  $('#extBtn').hidden = !curUrl;
 
   if (mode === 'preview' || mode === 'split') {
     renderInstantPreview();
@@ -1273,7 +1310,6 @@ function openPage(repoObj, filePath, url, title) {
 
   $('#vt').textContent = title;
   $('#vsub').textContent = url;
-  $('#ext').href = url;
 
   const f = $('#frame');
   f.removeAttribute('srcdoc');
@@ -1312,14 +1348,15 @@ async function openEditorForFile(repoObj, filePath, forceNew = false) {
   ed.repo = repoObj;
   ed.path = filePath || 'index.html';
   ed.sha = null;
-  curUrl = repoObj.pages ? siteBase(repoObj) + (ed.path === 'index.html' ? '' : ed.path.split('/').map(encodeURIComponent).join('/')) : '';
+  curUrl = repoObj.pages
+    ? siteBase(repoObj) + (ed.path === 'index.html' ? '' : ed.path.split('/').map(encodeURIComponent).join('/'))
+    : `https://github.com/${encodeURIComponent(user)}/${encodeURIComponent(repoObj.name)}/blob/${encodeURIComponent(repoObj.branch)}/${ed.path}`;
 
   setActiveRepoCard(repoObj.name);
   enterWorkspace();
 
   $('#vt').textContent = `${repoObj.name}/${ed.path}`;
   $('#vsub').textContent = `Branch: ${repoObj.branch}`;
-  if (curUrl) $('#ext').href = curUrl;
 
   setWorkspaceMode(wide() ? 'split' : 'edit');
 
@@ -1374,23 +1411,57 @@ async function openEditorForFile(repoObj, filePath, forceNew = false) {
   }
 }
 
+// Injects <base> and a safe localStorage bridge so scripts inside srcdoc previews never crash on localStorage access
 function renderInstantPreview() {
   const f = $('#frame');
   $('#previewBanner').hidden = false;
   let html = $('#codeInput').value;
 
-  // Inject <base> so relative assets (CSS/JS/images) resolve against the live GitHub Pages directory
+  const storageShim = `<script>
+(function(){
+  try {
+    var t = '__ph_test__';
+    window.localStorage.setItem(t, t);
+    window.localStorage.removeItem(t);
+  } catch (e) {
+    var pfx = 'ph_app_ls_${ed.repo ? ed.repo.name.replace(/[^a-zA-Z0-9_-]/g, '_') : 'default'}_';
+    var mem = {};
+    var pStore = null;
+    try { pStore = window.parent && window.parent.localStorage; } catch (err) {}
+    var fakeLS = {
+      getItem: function(k) {
+        try { if (pStore) return pStore.getItem(pfx + k); } catch(err){}
+        return Object.prototype.hasOwnProperty.call(mem, k) ? mem[k] : null;
+      },
+      setItem: function(k, v) {
+        mem[k] = String(v);
+        try { if (pStore) pStore.setItem(pfx + k, String(v)); } catch(err){}
+      },
+      removeItem: function(k) {
+        delete mem[k];
+        try { if (pStore) pStore.removeItem(pfx + k); } catch(err){}
+      },
+      clear: function() { mem = {}; }
+    };
+    try {
+      Object.defineProperty(window, 'localStorage', { value: fakeLS, configurable: true });
+      Object.defineProperty(window, 'sessionStorage', { value: fakeLS, configurable: true });
+    } catch (err) {}
+  }
+})();
+<\/script>`;
+
   if (ed.repo) {
     const dirParts = ed.path.split('/');
     dirParts.pop();
     const subDir = dirParts.length ? dirParts.map(encodeURIComponent).join('/') + '/' : '';
     const baseHref = siteBase(ed.repo) + subDir;
-    if (!/<base\s/i.test(html)) {
-      if (/<head[^>]*>/i.test(html)) {
-        html = html.replace(/(<head[^>]*>)/i, `$1<base href="${baseHref}">`);
-      } else {
-        html = `<base href="${baseHref}">` + html;
-      }
+    const headExtras = (!/<base\s/i.test(html) ? `<base href="${baseHref}">` : '') + storageShim;
+
+    if (/<head[^>]*>/i.test(html)) {
+      html = html.replace(/(<head[^>]*>)/i, `$1${headExtras}`);
+    } else {
+      html = headExtras + html;
     }
   }
   f.srcdoc = html;
@@ -1546,6 +1617,9 @@ $('#modeSplit').onclick = () => {
   }
 };
 
+// Open in Browser Button in Top Bar
+$('#extBtn').onclick = () => launchExternalBrowser(curUrl);
+
 // Commit & Push Workflow
 function openCommitDialog() {
   if (!ed.repo) return;
@@ -1590,7 +1664,6 @@ $('#pushCommitBtn').onclick = async () => {
     const encodedPath = targetPath.split('/').map(encodeURIComponent).join('/');
     const endpoint = `/repos/${encodeURIComponent(user)}/${encodeURIComponent(ed.repo.name)}/contents/${encodedPath}`;
 
-    // Ensure we have the latest SHA if path changed or SHA wasn't loaded
     let shaToUse = targetPath === ed.path ? ed.sha : null;
     if (!shaToUse) {
       try {
@@ -1620,6 +1693,10 @@ $('#pushCommitBtn').onclick = async () => {
     ed.remoteCode = codeInput.value;
     ed.dirty = false;
     ls.del(draftKey(ed.repo.name, ed.path));
+
+    if (window.Android && typeof window.Android.clearCache === 'function') {
+      window.Android.clearCache();
+    }
 
     $('#edFileLabel').textContent = `${ed.repo.name} / ${ed.path} (${ed.repo.branch})`;
     $('#edStatusLabel').textContent = 'Committed & pushed ✓';
@@ -1676,10 +1753,15 @@ $('#refresh').onclick = () => load(true);
 $('#back').onclick = closeViewer;
 $('#reload').onclick = () => {
   if (curUrl) {
+    if (window.Android && typeof window.Android.clearCache === 'function') {
+      window.Android.clearCache();
+    }
     const f = $('#frame');
     f.removeAttribute('srcdoc');
-    f.src = 'about:blank';
-    setTimeout(() => { f.src = curUrl; }, 50);
+    const sep = curUrl.includes('?') ? '&' : '?';
+    const bustedUrl = `${curUrl}${sep}_t=${Date.now()}`;
+    f.src = bustedUrl;
+    toast('Cache cleared & reloading…');
   }
 };
 
@@ -1710,7 +1792,7 @@ window.phBack = () => {
 };
 
 // --- AUTO-UPDATE LOGIC ---
-const APP_VERSION = 'v1.0.2';
+const APP_VERSION = 'v1.0.3';
 const UPDATE_REPO = 'hassanakhter079/hotpages';
 
 function escText(s) {
@@ -1750,7 +1832,11 @@ async function checkAppUpdate(interactive = false) {
       $('#updateMsg').innerHTML = `A new version <b>${escText(latestTag)}</b> is available (current: ${APP_VERSION}).<br><br>Would you like to download and install it now?`;
       $('#updateNotes').textContent = data.name || (data.body ? data.body.slice(0, 150) : 'Includes latest updates and bug fixes.');
       $('#updateConfirm').onclick = () => {
-        window.location.href = apk.browser_download_url;
+        if (window.Android && typeof window.Android.openBrowser === 'function') {
+          window.Android.openBrowser(apk.browser_download_url);
+        } else {
+          window.location.href = apk.browser_download_url;
+        }
         $('#updateDlg').close();
       };
       $('#updateDismiss').onclick = () => $('#updateDlg').close();

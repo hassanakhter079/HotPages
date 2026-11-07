@@ -8,6 +8,8 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
+import android.webkit.CookieManager;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -27,13 +29,40 @@ public class MainActivity extends Activity {
         web = new WebView(this);
         setContentView(web);
 
+        // Allow cookies, localStorage, and IndexedDB inside cross-origin GitHub Pages iframes
+        CookieManager cm = CookieManager.getInstance();
+        cm.setAcceptCookie(true);
+        cm.setAcceptThirdPartyCookies(web, true);
+
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);
         s.setDomStorageEnabled(true);
         s.setDatabaseEnabled(true);
+        s.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        s.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         s.setSupportMultipleWindows(true);
         s.setJavaScriptCanOpenWindowsAutomatically(true);
         s.setMediaPlaybackRequiresUserGesture(false);
+        s.setAllowFileAccess(true);
+        s.setAllowContentAccess(true);
+
+        // Native bridge for reliable external browser launching & cache clearing
+        web.addJavascriptInterface(new Object() {
+            @JavascriptInterface
+            public void openBrowser(final String url) {
+                if (url != null && !url.isEmpty()) {
+                    runOnUiThread(() -> openExternal(Uri.parse(url)));
+                }
+            }
+
+            @JavascriptInterface
+            public void clearCache() {
+                runOnUiThread(() -> {
+                    web.clearCache(true);
+                    CookieManager.getInstance().flush();
+                });
+            }
+        }, "Android");
 
         web.setWebViewClient(new WebViewClient() {
             @Override
@@ -75,9 +104,18 @@ public class MainActivity extends Activity {
         web.loadUrl(HOME);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Flush WebView storage and cookies to disk so progress is never lost
+        CookieManager.getInstance().flush();
+    }
+
     private void openExternal(Uri uri) {
         try {
-            startActivity(new Intent(Intent.ACTION_VIEW, uri));
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
         } catch (ActivityNotFoundException ignored) {
         }
     }
