@@ -1,4 +1,4 @@
-# HotPages (Pages Hub) ⚡
+# HotPages ⚡
 
 A lightning-fast, minimalist Android application and WebView container (~29 KB APK) for exploring, previewing, and editing GitHub Pages apps and standalone HTML tools.
 

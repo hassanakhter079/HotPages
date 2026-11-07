@@ -47,10 +47,8 @@ apksigner verify -v "$OUT_APK"
 
 echo "8. Copying APK to /sdcard/Download and /sdcard/Download/HotPages..."
 cp "$OUT_APK" "/sdcard/Download/HotPages.apk"
-cp "$OUT_APK" "/sdcard/Download/PagesHub.apk"
 if [ -d "/sdcard/Download/HotPages" ]; then
     cp "$OUT_APK" "/sdcard/Download/HotPages/HotPages.apk"
-    cp "$OUT_APK" "/sdcard/Download/HotPages/PagesHub.apk"
 fi
 
 echo "Build complete! APK saved to:"
