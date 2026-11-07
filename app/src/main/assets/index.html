@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
-<title>Pages Hub</title>
+<title>HotPages</title>
 <style>
 :root {
   --bg: #f1f5f4;
@@ -759,7 +759,7 @@ dialog input {
         <div class="brand">
           <div class="logo">&lt;/&gt;</div>
           <div class="title-wrap">
-            <h1>Pages Hub</h1>
+            <h1>HotPages</h1>
             <div class="user-pill" id="userBadge">@hassanakhter079</div>
           </div>
         </div>
@@ -798,7 +798,7 @@ dialog input {
         <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
       </button>
       <div class="vt-wrap">
-        <span id="vt">Pages Hub</span>
+        <span id="vt">HotPages</span>
         <span id="vsub">Select a repository or HTML file</span>
       </div>
 
@@ -896,9 +896,27 @@ dialog input {
     • Without a token: browse public repos, edit HTML locally, and test in Instant Preview.<br>
     • With a token (with <b>repo</b> or <b>Contents: Read &amp; Write</b> scope): 5,000 requests/hr and direct <b>Commit &amp; Push</b> from the HTML editor.
   </p>
+  <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between">
+    <div>
+      <div style="font-weight:600;font-size:0.9rem">HotPages <span id="appVerBadge" style="color:var(--accent)">v1.0.1</span></div>
+      <div style="font-size:0.8rem;color:var(--muted)" id="updateStatusText">Checks GitHub for new APK updates</div>
+    </div>
+    <button type="button" id="checkUpdateBtn" style="font-size:0.85rem;padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface)">Check Updates</button>
+  </div>
   <div class="acts">
     <button id="cancel">Cancel</button>
     <button id="save" class="primary">Save &amp; Reload</button>
+  </div>
+</dialog>
+
+<!-- APP UPDATE PROMPT DIALOG -->
+<dialog id="updateDlg" style="max-width:380px;border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--surface);color:var(--ink)">
+  <h2 style="margin:0 0 8px;font-size:1.15rem;display:flex;align-items:center;gap:8px">⚡ Update Available</h2>
+  <p id="updateMsg" style="font-size:0.9rem;line-height:1.45;color:var(--ink);margin:0 0 10px"></p>
+  <div style="font-size:0.8rem;color:var(--muted);background:var(--surface-2);padding:10px;border-radius:8px;margin:10px 0" id="updateNotes"></div>
+  <div class="acts" style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
+    <button type="button" id="updateDismiss" style="padding:8px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface)">Later</button>
+    <button type="button" id="updateConfirm" class="primary" style="padding:8px 14px;border:0;border-radius:8px;background:var(--accent);color:var(--on-accent);font-weight:600">Update Now</button>
   </div>
 </dialog>
 
@@ -909,7 +927,7 @@ dialog input {
     <input id="commitPath" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="index.html">
   </label>
   <label>Commit Message
-    <input id="commitMsg" autocomplete="off" placeholder="Update HTML via Pages Hub">
+    <input id="commitMsg" autocomplete="off" placeholder="Update HTML via HotPages">
   </label>
   <p class="hint" id="commitHint"></p>
   <div class="acts">
@@ -1284,7 +1302,7 @@ function starterHtmlTemplate(repoName, filePath) {
 </head>
 <body>
   <h1>Welcome to ${repoName}</h1>
-  <p>Edited directly inside <strong>Pages Hub</strong>.</p>
+  <p>Edited directly inside <strong>HotPages</strong>.</p>
 </body>
 </html>
 `;
@@ -1532,7 +1550,7 @@ $('#modeSplit').onclick = () => {
 function openCommitDialog() {
   if (!ed.repo) return;
   $('#commitPath').value = ed.path;
-  $('#commitMsg').value = `${ed.sha ? 'Update' : 'Create'} ${ed.path} via Pages Hub`;
+  $('#commitMsg').value = `${ed.sha ? 'Update' : 'Create'} ${ed.path} via HotPages`;
   $('#commitHint').textContent = token
     ? `Target: ${user}/${ed.repo.name} (branch: ${ed.repo.branch}). Note: GitHub Pages usually takes 30–60s to deploy after pushing.`
     : `No GitHub token added yet. Add a token in Settings to push directly to GitHub, or click "Save Local Draft".`;
@@ -1678,16 +1696,83 @@ document.querySelectorAll('.pill-btn').forEach(btn => {
 });
 
 window.phBack = () => {
+  const uDlg = $('#updateDlg');
+  if (uDlg && uDlg.open) { uDlg.close(); return true; }
   const cDlg = $('#commitDlg');
-  if (cDlg.open) { cDlg.close(); return true; }
+  if (cDlg && cDlg.open) { cDlg.close(); return true; }
   const sDlg = $('#setup');
-  if (sDlg.open) { sDlg.close(); return true; }
+  if (sDlg && sDlg.open) { sDlg.close(); return true; }
   if (document.body.classList.contains('viewing') && !wide()) {
     hideViewer();
     return true;
   }
   return false;
 };
+
+// --- AUTO-UPDATE LOGIC ---
+const APP_VERSION = 'v1.0.1';
+const UPDATE_REPO = 'hassanakhter079/hotpages';
+
+function escText(s) {
+  return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function isNewerVersion(latest, current) {
+  const l = (latest || '').replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0);
+  const c = (current || '').replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0);
+  for (let i = 0; i < Math.max(l.length, c.length); i++) {
+    const numL = l[i] || 0;
+    const numC = c[i] || 0;
+    if (numL > numC) return true;
+    if (numL < numC) return false;
+  }
+  return false;
+}
+
+async function checkAppUpdate(interactive = false) {
+  const statusEl = $('#updateStatusText');
+  if (statusEl) statusEl.textContent = 'Checking updates...';
+  try {
+    const res = await fetch(`https://api.github.com/repos/${UPDATE_REPO}/releases/latest`, {
+      headers: { 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if (!res.ok) {
+      if (interactive) alert('Could not reach GitHub Releases.');
+      if (statusEl) statusEl.textContent = 'Check failed';
+      return;
+    }
+    const data = await res.json();
+    const latestTag = data.tag_name;
+    if (latestTag && isNewerVersion(latestTag, APP_VERSION)) {
+      if (statusEl) statusEl.textContent = `New version: ${latestTag}`;
+      const assets = data.assets || [];
+      const apk = assets.find(a => a.name === 'HotPages.apk') || assets.find(a => a.name.endsWith('.apk')) || { browser_download_url: data.html_url };
+      $('#updateMsg').innerHTML = `A new version <b>${escText(latestTag)}</b> is available (current: ${APP_VERSION}).<br><br>Would you like to download and install it now?`;
+      $('#updateNotes').textContent = data.name || (data.body ? data.body.slice(0, 150) : 'Includes latest updates and bug fixes.');
+      $('#updateConfirm').onclick = () => {
+        window.location.href = apk.browser_download_url;
+        $('#updateDlg').close();
+      };
+      $('#updateDismiss').onclick = () => $('#updateDlg').close();
+      $('#updateDlg').showModal();
+    } else {
+      if (statusEl) statusEl.textContent = `Up to date (${APP_VERSION})`;
+      if (interactive) alert(`HotPages is up to date (${APP_VERSION})!`);
+    }
+  } catch (e) {
+    if (interactive) alert('Error checking updates: ' + e.message);
+    if (statusEl) statusEl.textContent = 'Offline / check failed';
+  }
+}
+
+if ($('#checkUpdateBtn')) {
+  $('#checkUpdateBtn').onclick = () => checkAppUpdate(true);
+}
+
+// Automatically check for updates on startup with prompt
+setTimeout(() => {
+  checkAppUpdate(false);
+}, 2500);
 
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   navigator.serviceWorker.register('sw.js').catch(() => {});

@@ -5,8 +5,8 @@ PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SDK_DIR="$HOME/android-sdk"
 ANDROID_JAR="$SDK_DIR/android-34/android.jar"
 KEYSTORE="$SDK_DIR/debug.keystore"
-OUT_APK="$PROJECT_DIR/build/PagesHub.apk"
-DOWNLOAD_APK="/sdcard/Download/PagesHub.apk"
+OUT_APK="$PROJECT_DIR/build/HotPages.apk"
+DOWNLOAD_APK="/sdcard/Download/HotPages.apk"
 
 cd "$PROJECT_DIR"
 rm -rf build gen && mkdir -p build/obj build/apk gen
@@ -46,8 +46,8 @@ echo "7. Verifying APK signature..."
 apksigner verify -v "$OUT_APK"
 
 echo "8. Copying APK to /sdcard/Download and /sdcard/Download/HotPages..."
-cp "$OUT_APK" "$DOWNLOAD_APK"
 cp "$OUT_APK" "/sdcard/Download/HotPages.apk"
+cp "$OUT_APK" "/sdcard/Download/PagesHub.apk"
 if [ -d "/sdcard/Download/HotPages" ]; then
     cp "$OUT_APK" "/sdcard/Download/HotPages/HotPages.apk"
     cp "$OUT_APK" "/sdcard/Download/HotPages/PagesHub.apk"
