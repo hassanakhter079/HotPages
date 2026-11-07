@@ -1,0 +1,16 @@
+# Build artifacts and generated files
+build/
+gen/
+*.apk
+*.dex
+*.class
+
+# Gradle & IDE files
+.gradle/
+.idea/
+*.iml
+local.properties
+
+# OS files
+.DS_Store
+Thumbs.db

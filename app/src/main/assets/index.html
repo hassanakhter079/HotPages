@@ -1,0 +1,1700 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b2e2b">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<title>Pages Hub</title>
+<style>
+:root {
+  --bg: #f1f5f4;
+  --surface: #ffffff;
+  --surface-2: #e6efed;
+  --ink: #0f1c1b;
+  --muted: #566a67;
+  --line: #d2dfdc;
+  --accent: #0d746b;
+  --accent-hover: #0a5c55;
+  --accent-soft: #d9f0ec;
+  --on-accent: #ffffff;
+  --warn: #d97706;
+  --warn-soft: #fef3c7;
+  --err: #dc2626;
+  --err-soft: #fee2e2;
+  --ed-bg: #121918;
+  --ed-gutter: #182220;
+  --ed-ink: #e4f0ee;
+  --ed-line: #263532;
+  --shadow: 0 4px 16px rgba(10, 32, 30, 0.06);
+  --radius: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1110;
+    --surface: #131d1c;
+    --surface-2: #1c2b29;
+    --ink: #e7f2f0;
+    --muted: #8ca39f;
+    --line: #233432;
+    --accent: #2dd4bf;
+    --accent-hover: #5eead4;
+    --accent-soft: #153531;
+    --on-accent: #06201d;
+    --warn: #fbbf24;
+    --warn-soft: #3b2a0c;
+    --err: #f87171;
+    --err-soft: #3b1515;
+    --shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  }
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; margin: 0; overflow: hidden; }
+body {
+  font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; user-select: none; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+/* Layout */
+#app {
+  display: grid;
+  grid-template-columns: minmax(320px, 410px) 1fr;
+  height: 100%;
+}
+
+/* Sidebar */
+#list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-right: 1px solid var(--line);
+  background: var(--bg);
+  overflow: hidden;
+}
+.top {
+  background: var(--surface);
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 12px;
+  border-bottom: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  z-index: 2;
+}
+.head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+.logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0d746b, #14b8a6);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 0.9rem;
+  letter-spacing: -0.03em;
+  flex-shrink: 0;
+}
+.title-wrap { min-width: 0; }
+h1 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.user-pill {
+  font-size: 0.76rem;
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ib {
+  width: 38px;
+  height: 38px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  display: inline-grid;
+  place-items: center;
+  color: var(--ink);
+  transition: background 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+.ib:hover, .ib:active { background: var(--surface-2); border-color: var(--line); }
+.ib svg { width: 19px; height: 19px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.spinning svg { animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.search-wrap {
+  position: relative;
+  margin-top: 10px;
+}
+.search-wrap svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  stroke: var(--muted);
+  stroke-width: 2;
+  fill: none;
+  pointer-events: none;
+}
+#q {
+  width: 100%;
+  height: 40px;
+  padding: 0 34px 0 36px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  font-size: 0.92rem;
+}
+#clearQ {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 1.1rem;
+}
+.filters {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+.pill-btn {
+  flex: 1;
+  height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0 8px;
+  transition: all 0.15s;
+}
+.pill-btn.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+#listBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 12px 24px;
+}
+#status {
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+#status.err {
+  background: var(--err-soft);
+  border-color: var(--err);
+  color: var(--err);
+}
+#count {
+  padding: 0 4px 8px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Repo Cards */
+ul#repos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.repo-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.repo-card.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.card-main {
+  padding: 12px 14px 10px;
+}
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.name {
+  font: 700 0.96rem/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.badges {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 99px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.badge.live {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.badge.off {
+  background: var(--surface-2);
+  color: var(--muted);
+}
+.badge.draft {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.desc {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 0.84rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.meta {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+.branch-tag {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: var(--surface-2);
+  padding: 1px 6px;
+  border-radius: 5px;
+}
+.card-actions {
+  display: flex;
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+}
+.act-btn {
+  flex: 1;
+  height: 36px;
+  border: 0;
+  border-right: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: background 0.15s;
+}
+.act-btn:last-child { border-right: 0; }
+.act-btn:hover, .act-btn:active { background: var(--surface-2); }
+.act-btn.primary-act { color: var(--accent); }
+.act-btn[disabled] { opacity: 0.45; pointer-events: none; }
+.act-btn svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; }
+
+/* Expanded File List */
+.filelist {
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+  padding: 8px 10px 10px;
+}
+.filelist-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 4px 6px;
+  font-size: 0.76rem;
+  font-weight: 650;
+  color: var(--muted);
+}
+.new-file-btn {
+  border: 1px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+.file-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 8px;
+  margin-top: 4px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+.file-open {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: 6px 8px;
+  font: 600 0.82rem ui-monospace, SFMono-Regular, Menlo, monospace;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+}
+.file-edit-btn {
+  border: 0;
+  border-radius: 6px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  padding: 6px 10px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Main Workspace (Viewer + Editor) */
+#viewer {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
+  background: var(--surface);
+}
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: calc(8px + env(safe-area-inset-top, 0px)) 10px 8px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  flex-wrap: wrap;
+}
+.vt-wrap {
+  flex: 1;
+  min-width: 120px;
+}
+#vt {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font: 700 0.9rem ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+#vsub {
+  display: block;
+  font-size: 0.74rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mode-switch {
+  display: inline-flex;
+  background: var(--bg);
+  padding: 3px;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+}
+.mode-btn {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+.mode-btn.active {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.btn-primary {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 9px;
+  border: 0;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.82rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-outline {
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+}
+
+/* Workspace Body */
+#workBody {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  position: relative;
+}
+#frameWrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
+  background: #fff;
+}
+#previewBanner {
+  background: var(--warn-soft);
+  color: var(--warn);
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+}
+#frame {
+  flex: 1;
+  width: 100%;
+  border: 0;
+  background: #fff;
+}
+
+/* Built-in HTML Code Editor */
+#editorPane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
+  background: var(--ed-bg);
+  color: var(--ed-ink);
+  border-right: 1px solid var(--ed-line);
+}
+.ed-info-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--ed-gutter);
+  border-bottom: 1px solid var(--ed-line);
+  font-size: 0.76rem;
+  color: #9ab0ac;
+}
+.ed-tools {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 6px 8px;
+  background: var(--ed-gutter);
+  border-bottom: 1px solid var(--ed-line);
+  scrollbar-width: none;
+}
+.ed-tools::-webkit-scrollbar { display: none; }
+.sym-btn {
+  height: 30px;
+  min-width: 32px;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: 1px solid #2e403d;
+  background: #1f2d2b;
+  color: #e4f0ee;
+  font: 600 0.8rem ui-monospace, SFMono-Regular, Menlo, monospace;
+  flex-shrink: 0;
+}
+.sym-btn:active { background: var(--accent); color: var(--on-accent); }
+.sym-sep {
+  width: 1px;
+  height: 20px;
+  background: var(--ed-line);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+#findBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #1b2725;
+  border-bottom: 1px solid var(--ed-line);
+}
+#findBar input {
+  flex: 1;
+  min-width: 80px;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: 1px solid #2e403d;
+  background: var(--ed-bg);
+  color: var(--ed-ink);
+  font-size: 0.8rem;
+}
+
+.code-area {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+#lineNums {
+  width: 44px;
+  padding: 12px 6px 24px 0;
+  text-align: right;
+  background: var(--ed-gutter);
+  color: #5c7470;
+  font: 13.5px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  user-select: none;
+  overflow: hidden;
+  border-right: 1px solid var(--ed-line);
+  flex-shrink: 0;
+}
+#codeInput {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  margin: 0;
+  padding: 12px 14px 40px;
+  background: var(--ed-bg);
+  color: var(--ed-ink);
+  font: 13.5px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  resize: none;
+  outline: none;
+  tab-size: 2;
+  white-space: pre;
+  overflow: auto;
+}
+#codeInput.wrap {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Empty State */
+#empty {
+  margin: auto;
+  padding: 32px 24px;
+  max-width: 360px;
+  color: var(--muted);
+  text-align: center;
+}
+.empty-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  margin: 0 auto 14px;
+}
+.empty-icon svg { width: 28px; height: 28px; stroke: currentColor; stroke-width: 1.8; fill: none; }
+#empty h3 { margin: 0 0 6px; color: var(--ink); font-size: 1.05rem; }
+#empty p { margin: 0; font-size: 0.88rem; }
+
+/* Dialogs */
+dialog {
+  width: min(440px, 92vw);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 20px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+}
+dialog::backdrop { background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(2px); }
+dialog h2 { margin: 0 0 8px; font-size: 1.15rem; }
+dialog label { display: block; margin: 12px 0; font-size: 0.86rem; font-weight: 600; color: var(--muted); }
+dialog input {
+  display: block;
+  width: 100%;
+  height: 42px;
+  margin-top: 5px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  font-weight: 400;
+  color: var(--ink);
+}
+.hint { font-size: 0.8rem; color: var(--muted); margin: 8px 0 0; line-height: 1.4; }
+.acts { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+.acts button {
+  height: 40px;
+  padding: 0 15px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  font-weight: 600;
+}
+.acts .primary {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+
+/* Toast */
+#toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #111c1b;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 99px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 100;
+  max-width: 90vw;
+  text-align: center;
+}
+#toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+@media (max-width: 899px) {
+  #app { display: block; }
+  #list { height: 100%; border: 0; }
+  #viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    transform: translateX(100%);
+    visibility: hidden;
+    transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0.22s;
+  }
+  body.viewing #viewer {
+    transform: none;
+    visibility: visible;
+  }
+  #modeSplit { display: none; }
+}
+@media (min-width: 900px) {
+  #back { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- LEFT SIDEBAR: REPO EXPLORER -->
+  <aside id="list">
+    <div class="top">
+      <div class="head">
+        <div class="brand">
+          <div class="logo">&lt;/&gt;</div>
+          <div class="title-wrap">
+            <h1>Pages Hub</h1>
+            <div class="user-pill" id="userBadge">@hassanakhter079</div>
+          </div>
+        </div>
+        <button class="ib" id="refresh" title="Refresh repositories" aria-label="Refresh list">
+          <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+        </button>
+        <button class="ib" id="settings" title="GitHub Settings" aria-label="Settings">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="q" type="search" placeholder="Search repositories…" aria-label="Search repos">
+        <button id="clearQ" hidden aria-label="Clear search">×</button>
+      </div>
+
+      <div class="filters" role="tablist">
+        <button class="pill-btn active" data-filter="pages">Pages Sites</button>
+        <button class="pill-btn" data-filter="all">All Repos</button>
+        <button class="pill-btn" data-filter="drafts">Drafts</button>
+      </div>
+    </div>
+
+    <div id="listBody">
+      <div id="status" hidden></div>
+      <div id="count"></div>
+      <ul id="repos"></ul>
+    </div>
+  </aside>
+
+  <!-- RIGHT WORKSPACE: VIEWER + HTML EDITOR -->
+  <main id="viewer">
+    <div class="bar">
+      <button class="ib" id="back" aria-label="Back to list">
+        <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <div class="vt-wrap">
+        <span id="vt">Pages Hub</span>
+        <span id="vsub">Select a repository or HTML file</span>
+      </div>
+
+      <div class="mode-switch" id="modeSwitch" hidden>
+        <button class="mode-btn active" id="modeView">Live</button>
+        <button class="mode-btn" id="modeEdit">Edit HTML</button>
+        <button class="mode-btn" id="modePreview">Preview</button>
+        <button class="mode-btn" id="modeSplit">Split</button>
+      </div>
+
+      <button class="btn-primary" id="saveCommitBtn" hidden>Save / Commit</button>
+      <button class="ib" id="reload" title="Reload page" aria-label="Reload page" hidden>
+        <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+      </button>
+      <a class="btn-outline" id="ext" target="_blank" rel="noopener" hidden>Browser ↗</a>
+    </div>
+
+    <div id="workBody">
+      <!-- CODE EDITOR PANE -->
+      <section id="editorPane" hidden>
+        <div class="ed-info-bar">
+          <span id="edFileLabel">index.html</span>
+          <span id="edStatusLabel">Ready</span>
+        </div>
+
+        <div class="ed-tools" aria-label="Quick code toolbar">
+          <button class="sym-btn" data-ins="  ">Tab</button>
+          <button class="sym-btn" data-ins="<">&lt;</button>
+          <button class="sym-btn" data-ins=">">&gt;</button>
+          <button class="sym-btn" data-ins="/">&sol;</button>
+          <button class="sym-btn" data-ins="=">=</button>
+          <button class="sym-btn" data-ins="&quot;">&quot;</button>
+          <button class="sym-btn" data-ins="'">'</button>
+          <button class="sym-btn" data-ins="!">!</button>
+          <button class="sym-btn" data-ins="{">{</button>
+          <button class="sym-btn" data-ins="}">}</button>
+          <button class="sym-btn" data-ins=";">;</button>
+          <button class="sym-btn" data-snippet="div">&lt;div&gt;</button>
+          <span class="sym-sep"></span>
+          <button class="sym-btn" id="edUndo" title="Undo">Undo</button>
+          <button class="sym-btn" id="edRedo" title="Redo">Redo</button>
+          <button class="sym-btn" id="edFindBtn" title="Find & Replace">Find</button>
+          <button class="sym-btn" id="edWrapBtn" title="Toggle Word Wrap">Wrap</button>
+          <button class="sym-btn" id="edCopyBtn" title="Copy HTML">Copy</button>
+          <button class="sym-btn" id="edResetBtn" title="Discard local draft">Revert</button>
+        </div>
+
+        <div id="findBar" hidden>
+          <input id="findIn" placeholder="Find text…">
+          <input id="repIn" placeholder="Replace with…">
+          <button class="sym-btn" id="findNextBtn">Next</button>
+          <button class="sym-btn" id="repAllBtn">Replace All</button>
+          <button class="sym-btn" id="closeFindBtn">×</button>
+        </div>
+
+        <div class="code-area">
+          <div id="lineNums" aria-hidden="true">1</div>
+          <textarea id="codeInput" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Loading HTML source…"></textarea>
+        </div>
+      </section>
+
+      <!-- LIVE / DRAFT PREVIEW PANE -->
+      <section id="frameWrap" hidden>
+        <div id="previewBanner" hidden>
+          <span>Instant Local Preview (Unsaved Edits)</span>
+          <button class="new-file-btn" id="bannerCommitBtn">Commit to GitHub</button>
+        </div>
+        <iframe id="frame" title="Page viewer"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads"
+          allow="fullscreen; clipboard-write"></iframe>
+      </section>
+
+      <!-- EMPTY STATE -->
+      <div id="empty">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <h3>View &amp; Edit Your Pages</h3>
+        <p>Select any repository from the list to browse its live GitHub Pages site or edit its HTML files right inside the app.</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- GITHUB ACCOUNT SETTINGS DIALOG -->
+<dialog id="setup">
+  <h2>GitHub Account &amp; Token</h2>
+  <label>GitHub Username
+    <input id="u" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="e.g. hassanakhter079">
+  </label>
+  <label>Personal Access Token (Required to push HTML edits)
+    <input id="t" type="password" autocomplete="off" placeholder="ghp_... or github_pat_...">
+  </label>
+  <p class="hint">
+    • Without a token: browse public repos, edit HTML locally, and test in Instant Preview.<br>
+    • With a token (with <b>repo</b> or <b>Contents: Read &amp; Write</b> scope): 5,000 requests/hr and direct <b>Commit &amp; Push</b> from the HTML editor.
+  </p>
+  <div class="acts">
+    <button id="cancel">Cancel</button>
+    <button id="save" class="primary">Save &amp; Reload</button>
+  </div>
+</dialog>
+
+<!-- COMMIT / SAVE HTML DIALOG -->
+<dialog id="commitDlg">
+  <h2>Save &amp; Commit HTML</h2>
+  <label>File Path in Repository
+    <input id="commitPath" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="index.html">
+  </label>
+  <label>Commit Message
+    <input id="commitMsg" autocomplete="off" placeholder="Update HTML via Pages Hub">
+  </label>
+  <p class="hint" id="commitHint"></p>
+  <div class="acts">
+    <button id="commitCancel">Cancel</button>
+    <button id="saveDraftOnly">Save Local Draft</button>
+    <button id="pushCommitBtn" class="primary">Commit &amp; Push</button>
+  </div>
+</dialog>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const ls = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+
+let user = ls.get('ph_user') || 'hassanakhter079';
+let token = ls.get('ph_token') || '';
+let repos = [];
+let filterMode = ls.get('ph_filter') || 'pages';
+let activeKey = '';
+let curUrl = '';
+let viewMode = 'view'; // 'view' | 'edit' | 'preview' | 'split'
+
+// Current Editor State
+const ed = {
+  repo: null,
+  path: 'index.html',
+  sha: null,
+  remoteCode: '',
+  dirty: false,
+  loading: false
+};
+
+try { repos = JSON.parse(ls.get('ph_repos') || '[]'); } catch (e) {}
+
+const wide = () => matchMedia('(min-width:900px)').matches;
+
+function el(t, a = {}, ...c) {
+  const n = document.createElement(t);
+  for (const k in a) {
+    if (k.startsWith('on')) n.addEventListener(k.slice(2), a[k]);
+    else if (a[k] !== undefined && a[k] !== false) n.setAttribute(k, a[k]);
+  }
+  n.append(...c);
+  return n;
+}
+
+// UTF-8 Safe Base64 Helpers for GitHub API
+function b64DecodeUtf8(b64) {
+  const bin = atob(b64.replace(/\s/g, ''));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder('utf-8').decode(bytes);
+}
+function b64EncodeUtf8(str) {
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+
+let toastTimer;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+const siteBase = r =>
+  `https://${user.toLowerCase()}.github.io/` +
+  (r.name.toLowerCase() === user.toLowerCase() + '.github.io' ? '' : encodeURIComponent(r.name) + '/');
+
+const fmt = d => d ? new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+
+const draftKey = (rName, path) => `ph_draft_${user.toLowerCase()}_${rName}_${path}`;
+function hasRepoDraft(rName) {
+  const prefix = `ph_draft_${user.toLowerCase()}_${rName}_`;
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      if ((localStorage.key(i) || '').startsWith(prefix)) return true;
+    }
+  } catch (e) {}
+  return false;
+}
+
+async function api(path, opts = {}) {
+  const h = { Accept: 'application/vnd.github+json', ...(opts.headers || {}) };
+  if (token) h.Authorization = 'Bearer ' + token;
+  const r = await fetch('https://api.github.com' + path, { ...opts, headers: h });
+  if (!r.ok) {
+    let detail = '';
+    try { const j = await r.json(); detail = j.message || ''; } catch (e) {}
+    if (r.status === 403 || r.status === 429) throw new Error('GitHub rate limit or permission error. Add/check your token in settings.');
+    if (r.status === 404) {
+      const err = new Error(detail || 'Resource not found (404).');
+      err.status = 404;
+      throw err;
+    }
+    if (r.status === 401) throw new Error('GitHub token rejected. Check it in settings.');
+    throw new Error(detail || 'GitHub error ' + r.status + '.');
+  }
+  return r.json();
+}
+
+function status(msg, err) {
+  const s = $('#status');
+  s.textContent = msg;
+  s.className = err ? 'err' : '';
+  s.hidden = !msg;
+}
+
+function updateFilterUI() {
+  document.querySelectorAll('.pill-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.filter === filterMode);
+  });
+}
+
+async function load(force) {
+  $('#userBadge').textContent = '@' + (user || 'guest');
+  if (!user) { openSettings(); return; }
+  const fresh = Date.now() - Number(ls.get('ph_time') || 0) < 6e5;
+  if (!force && fresh && repos.length) { render(); return; }
+
+  $('#refresh').classList.add('spinning');
+  status('Syncing repositories from GitHub…');
+  try {
+    let all = [];
+    for (let p = 1; p <= 5; p++) {
+      const b = await api(
+        token
+          ? `/user/repos?affiliation=owner&per_page=100&page=${p}`
+          : `/users/${encodeURIComponent(user)}/repos?per_page=100&page=${p}`
+      );
+      all = all.concat(b);
+      if (b.length < 100) break;
+    }
+    repos = all
+      .filter(r => r.owner && r.owner.login.toLowerCase() === user.toLowerCase())
+      .map(r => ({
+        name: r.name,
+        desc: r.description || '',
+        pages: !!r.has_pages,
+        branch: r.default_branch || 'main',
+        pushed: r.pushed_at || ''
+      }));
+    repos.sort((a, b) => b.pushed.localeCompare(a.pushed));
+    ls.set('ph_repos', JSON.stringify(repos));
+    ls.set('ph_time', String(Date.now()));
+    status('');
+  } catch (e) {
+    status(e.message + (repos.length ? ' Showing cached repositories.' : ''), true);
+  } finally {
+    $('#refresh').classList.remove('spinning');
+  }
+  render();
+}
+
+function render() {
+  $('#userBadge').textContent = '@' + user;
+  updateFilterUI();
+  const q = $('#q').value.trim().toLowerCase();
+  $('#clearQ').hidden = !q;
+
+  const ul = $('#repos');
+  const list = repos.filter(r => {
+    if (filterMode === 'pages' && !r.pages) return false;
+    if (filterMode === 'drafts' && !hasRepoDraft(r.name)) return false;
+    if (q && !r.name.toLowerCase().includes(q) && !r.desc.toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  ul.textContent = '';
+  $('#count').textContent = repos.length ? `${list.length} of ${repos.length} repositories` : '';
+
+  if (!list.length && repos.length && $('#status').hidden) {
+    status(
+      filterMode === 'drafts'
+        ? 'No saved local HTML drafts yet. Edit any HTML file to create one.'
+        : filterMode === 'pages'
+        ? 'No GitHub Pages sites match. Switch to “All Repos” to browse or edit everything.'
+        : 'No repositories match your search.'
+    );
+  }
+
+  list.forEach(r => {
+    const hasDraft = hasRepoDraft(r.name);
+    const box = el('div', { class: 'filelist', hidden: '' });
+
+    const badges = el('div', { class: 'badges' },
+      hasDraft ? el('span', { class: 'badge draft' }, 'Draft') : '',
+      r.pages
+        ? el('span', { class: 'badge live' }, el('span', { class: 'dot' }), 'Live')
+        : el('span', { class: 'badge off' }, 'No Pages')
+    );
+
+    const cardMain = el('div', { class: 'card-main' },
+      el('div', { class: 'card-top' }, el('div', { class: 'name' }, r.name), badges),
+      r.desc ? el('div', { class: 'desc' }, r.desc) : '',
+      el('div', { class: 'meta' },
+        el('span', { class: 'branch-tag' }, r.branch),
+        el('span', {}, 'Updated ' + fmt(r.pushed))
+      )
+    );
+
+    const openSiteBtn = el('button', {
+      class: 'act-btn primary-act',
+      disabled: !r.pages,
+      onclick: () => openPage(r, 'index.html', siteBase(r), r.name)
+    }, 'Open Site');
+
+    const editIndexBtn = el('button', {
+      class: 'act-btn',
+      onclick: () => openEditorForFile(r, 'index.html')
+    }, 'Edit HTML');
+
+    const filesBtn = el('button', {
+      class: 'act-btn',
+      onclick: () => toggleFiles(r, box)
+    }, 'HTML Files ▾');
+
+    const actions = el('div', { class: 'card-actions' }, openSiteBtn, editIndexBtn, filesBtn);
+
+    ul.append(
+      el('li', {
+        class: 'repo-card ' + (activeKey === r.name ? 'active' : ''),
+        'data-key': r.name
+      }, cardMain, actions, box)
+    );
+  });
+}
+
+async function toggleFiles(r, box) {
+  if (box.dataset.loaded) {
+    box.hidden = !box.hidden;
+    return;
+  }
+  box.hidden = false;
+  box.textContent = 'Scanning repository for HTML files…';
+  try {
+    const t = await api(`/repos/${encodeURIComponent(user)}/${encodeURIComponent(r.name)}/git/trees/${encodeURIComponent(r.branch)}?recursive=1`);
+    const hs = (t.tree || []).filter(x => x.type === 'blob' && /\.html?$/i.test(x.path));
+    box.textContent = '';
+
+    const head = el('div', { class: 'filelist-head' },
+      el('span', {}, `${hs.length} HTML file${hs.length === 1 ? '' : 's'}`),
+      el('button', {
+        class: 'new-file-btn',
+        onclick: () => promptNewFile(r)
+      }, '+ New HTML')
+    );
+    box.append(head);
+
+    if (!hs.length) {
+      box.append(el('div', { style: 'padding:6px 4px;font-size:0.8rem;color:var(--muted)' }, 'No .html files yet. Click "+ New HTML" to create index.html.'));
+    }
+
+    hs.forEach(x => {
+      const fUrl = siteBase(r) + x.path.split('/').map(encodeURIComponent).join('/');
+      const isDraft = !!ls.get(draftKey(r.name, x.path));
+      const row = el('div', { class: 'file-row' },
+        el('button', {
+          class: 'file-open',
+          onclick: () => r.pages ? openPage(r, x.path, fUrl, r.name + '/' + x.path) : openEditorForFile(r, x.path)
+        }, x.path + (isDraft ? ' (draft)' : '')),
+        el('button', {
+          class: 'file-edit-btn',
+          onclick: () => openEditorForFile(r, x.path)
+        }, 'Edit </>')
+      );
+      box.append(row);
+    });
+    box.dataset.loaded = '1';
+  } catch (e) {
+    box.textContent = e.message;
+  }
+}
+
+function promptNewFile(r) {
+  const name = prompt('Enter new HTML file path (e.g. index.html or about.html):', 'index.html');
+  if (!name) return;
+  let clean = name.trim().replace(/^\/+/, '');
+  if (!/\.html?$/i.test(clean)) clean += '.html';
+  openEditorForFile(r, clean, true);
+}
+
+function setActiveRepoCard(key) {
+  activeKey = key;
+  document.querySelectorAll('#repos .repo-card').forEach(li => {
+    li.classList.toggle('active', li.dataset.key === key);
+  });
+}
+
+function enterWorkspace() {
+  $('#empty').hidden = true;
+  $('#modeSwitch').hidden = false;
+  document.body.classList.add('viewing');
+  if (!wide() && !(history.state && history.state.v)) {
+    history.pushState({ v: 1 }, '');
+  }
+}
+
+function setWorkspaceMode(mode) {
+  viewMode = mode;
+  $('#modeView').classList.toggle('active', mode === 'view');
+  $('#modeEdit').classList.toggle('active', mode === 'edit');
+  $('#modePreview').classList.toggle('active', mode === 'preview');
+  $('#modeSplit').classList.toggle('active', mode === 'split');
+
+  const showEditor = mode === 'edit' || mode === 'split';
+  const showFrame = mode === 'view' || mode === 'preview' || mode === 'split';
+
+  $('#editorPane').hidden = !showEditor;
+  $('#frameWrap').hidden = !showFrame;
+  $('#saveCommitBtn').hidden = !showEditor && mode !== 'preview';
+  $('#reload').hidden = mode !== 'view';
+  $('#ext').hidden = !curUrl;
+
+  if (mode === 'preview' || mode === 'split') {
+    renderInstantPreview();
+  } else if (mode === 'view') {
+    $('#previewBanner').hidden = true;
+    const f = $('#frame');
+    f.removeAttribute('srcdoc');
+    if (curUrl && f.getAttribute('src') !== curUrl) {
+      f.src = curUrl;
+    }
+  }
+}
+
+function openPage(repoObj, filePath, url, title) {
+  ed.repo = repoObj;
+  ed.path = filePath || 'index.html';
+  curUrl = url;
+
+  setActiveRepoCard(repoObj.name);
+  enterWorkspace();
+
+  $('#vt').textContent = title;
+  $('#vsub').textContent = url;
+  $('#ext').href = url;
+
+  const f = $('#frame');
+  f.removeAttribute('srcdoc');
+  f.src = url;
+  setWorkspaceMode('view');
+}
+
+function starterHtmlTemplate(repoName, filePath) {
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${repoName} - ${filePath}</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 720px;
+      margin: 40px auto;
+      padding: 0 20px;
+      line-height: 1.6;
+      color: #1f2937;
+    }
+    h1 { color: #0d746b; }
+  </style>
+</head>
+<body>
+  <h1>Welcome to ${repoName}</h1>
+  <p>Edited directly inside <strong>Pages Hub</strong>.</p>
+</body>
+</html>
+`;
+}
+
+async function openEditorForFile(repoObj, filePath, forceNew = false) {
+  ed.repo = repoObj;
+  ed.path = filePath || 'index.html';
+  ed.sha = null;
+  curUrl = repoObj.pages ? siteBase(repoObj) + (ed.path === 'index.html' ? '' : ed.path.split('/').map(encodeURIComponent).join('/')) : '';
+
+  setActiveRepoCard(repoObj.name);
+  enterWorkspace();
+
+  $('#vt').textContent = `${repoObj.name}/${ed.path}`;
+  $('#vsub').textContent = `Branch: ${repoObj.branch}`;
+  if (curUrl) $('#ext').href = curUrl;
+
+  setWorkspaceMode(wide() ? 'split' : 'edit');
+
+  const input = $('#codeInput');
+  input.value = '';
+  input.placeholder = 'Fetching HTML from GitHub…';
+  $('#edFileLabel').textContent = `${repoObj.name} / ${ed.path} (${repoObj.branch})`;
+  $('#edStatusLabel').textContent = 'Loading…';
+  updateLineNumbers();
+
+  const savedDraft = ls.get(draftKey(repoObj.name, ed.path));
+  const apiPath = `/repos/${encodeURIComponent(user)}/${encodeURIComponent(repoObj.name)}/contents/${ed.path.split('/').map(encodeURIComponent).join('/')}?ref=${encodeURIComponent(repoObj.branch)}`;
+
+  try {
+    if (forceNew) {
+      const err = new Error('New file');
+      err.status = 404;
+      throw err;
+    }
+    const data = await api(apiPath);
+    ed.sha = data.sha || null;
+    ed.remoteCode = data.content ? b64DecodeUtf8(data.content) : '';
+
+    if (savedDraft !== null && savedDraft !== ed.remoteCode) {
+      input.value = savedDraft;
+      ed.dirty = true;
+      $('#edStatusLabel').textContent = 'Restored local draft ●';
+      toast('Loaded your unsaved local draft');
+    } else {
+      input.value = ed.remoteCode;
+      ed.dirty = false;
+      $('#edStatusLabel').textContent = 'Synced with GitHub';
+    }
+  } catch (e) {
+    if (e.status === 404) {
+      ed.sha = null;
+      ed.remoteCode = '';
+      input.value = savedDraft !== null ? savedDraft : starterHtmlTemplate(repoObj.name, ed.path);
+      ed.dirty = true;
+      $('#edStatusLabel').textContent = 'New HTML file (uncommitted)';
+    } else {
+      input.value = savedDraft !== null ? savedDraft : starterHtmlTemplate(repoObj.name, ed.path);
+      ed.dirty = true;
+      $('#edStatusLabel').textContent = 'Offline / Local Draft mode';
+      toast(e.message);
+    }
+  }
+
+  updateLineNumbers();
+  if (viewMode === 'split' || viewMode === 'preview') {
+    renderInstantPreview();
+  }
+}
+
+function renderInstantPreview() {
+  const f = $('#frame');
+  $('#previewBanner').hidden = false;
+  let html = $('#codeInput').value;
+
+  // Inject <base> so relative assets (CSS/JS/images) resolve against the live GitHub Pages directory
+  if (ed.repo) {
+    const dirParts = ed.path.split('/');
+    dirParts.pop();
+    const subDir = dirParts.length ? dirParts.map(encodeURIComponent).join('/') + '/' : '';
+    const baseHref = siteBase(ed.repo) + subDir;
+    if (!/<base\s/i.test(html)) {
+      if (/<head[^>]*>/i.test(html)) {
+        html = html.replace(/(<head[^>]*>)/i, `$1<base href="${baseHref}">`);
+      } else {
+        html = `<base href="${baseHref}">` + html;
+      }
+    }
+  }
+  f.srcdoc = html;
+}
+
+function updateLineNumbers() {
+  const code = $('#codeInput').value;
+  const count = (code.match(/\n/g) || []).length + 1;
+  let out = '';
+  for (let i = 1; i <= count; i++) out += i + '\n';
+  $('#lineNums').textContent = out;
+}
+
+function onCodeEdited() {
+  updateLineNumbers();
+  if (!ed.repo) return;
+  const val = $('#codeInput').value;
+  ed.dirty = val !== ed.remoteCode;
+  if (ed.dirty) {
+    ls.set(draftKey(ed.repo.name, ed.path), val);
+    $('#edStatusLabel').textContent = 'Draft saved locally ●';
+  } else {
+    ls.del(draftKey(ed.repo.name, ed.path));
+    $('#edStatusLabel').textContent = 'No changes';
+  }
+  if (viewMode === 'split') {
+    clearTimeout(onCodeEdited.t);
+    onCodeEdited.t = setTimeout(renderInstantPreview, 250);
+  }
+}
+
+const codeInput = $('#codeInput');
+codeInput.addEventListener('input', onCodeEdited);
+codeInput.addEventListener('scroll', () => {
+  $('#lineNums').scrollTop = codeInput.scrollTop;
+});
+
+// Smart Tab & Enter auto-indent inside textarea
+codeInput.addEventListener('keydown', e => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    insertAtCursor('  ');
+  } else if (e.key === 'Enter') {
+    const start = codeInput.selectionStart;
+    const before = codeInput.value.slice(0, start);
+    const lineStart = before.lastIndexOf('\n') + 1;
+    const currentLine = before.slice(lineStart);
+    const indent = (currentLine.match(/^\s+/) || [''])[0];
+    if (indent) {
+      e.preventDefault();
+      insertAtCursor('\n' + indent);
+    }
+  }
+});
+
+function insertAtCursor(text, cursorOffset = 0) {
+  codeInput.focus();
+  const start = codeInput.selectionStart;
+  const end = codeInput.selectionEnd;
+  const val = codeInput.value;
+  codeInput.value = val.slice(0, start) + text + val.slice(end);
+  const newPos = start + text.length + cursorOffset;
+  codeInput.setSelectionRange(newPos, newPos);
+  onCodeEdited();
+}
+
+// Developer Quick Toolbar events
+document.querySelectorAll('.sym-btn[data-ins]').forEach(btn => {
+  btn.onclick = () => insertAtCursor(btn.dataset.ins);
+});
+document.querySelectorAll('.sym-btn[data-snippet]').forEach(btn => {
+  btn.onclick = () => insertAtCursor('<div></div>', -6);
+});
+
+$('#edUndo').onclick = () => { codeInput.focus(); document.execCommand('undo'); onCodeEdited(); };
+$('#edRedo').onclick = () => { codeInput.focus(); document.execCommand('redo'); onCodeEdited(); };
+$('#edWrapBtn').onclick = () => {
+  codeInput.classList.toggle('wrap');
+  toast(codeInput.classList.contains('wrap') ? 'Word wrap enabled' : 'Word wrap off');
+};
+$('#edCopyBtn').onclick = async () => {
+  try {
+    await navigator.clipboard.writeText(codeInput.value);
+    toast('HTML copied to clipboard');
+  } catch (e) {
+    codeInput.select();
+    document.execCommand('copy');
+    toast('HTML copied');
+  }
+};
+$('#edResetBtn').onclick = () => {
+  if (!ed.repo) return;
+  if (!confirm('Discard local draft and revert to the GitHub version?')) return;
+  ls.del(draftKey(ed.repo.name, ed.path));
+  codeInput.value = ed.remoteCode;
+  ed.dirty = false;
+  updateLineNumbers();
+  $('#edStatusLabel').textContent = 'Reverted to GitHub version';
+  if (viewMode === 'split' || viewMode === 'preview') renderInstantPreview();
+  render();
+  toast('Local draft discarded');
+};
+
+// Find & Replace Bar
+$('#edFindBtn').onclick = () => {
+  const fb = $('#findBar');
+  fb.hidden = !fb.hidden;
+  if (!fb.hidden) $('#findIn').focus();
+};
+$('#closeFindBtn').onclick = () => { $('#findBar').hidden = true; };
+$('#findNextBtn').onclick = () => {
+  const needle = $('#findIn').value;
+  if (!needle) return;
+  const hay = codeInput.value;
+  let idx = hay.indexOf(needle, codeInput.selectionEnd);
+  if (idx === -1) idx = hay.indexOf(needle, 0);
+  if (idx !== -1) {
+    codeInput.focus();
+    codeInput.setSelectionRange(idx, idx + needle.length);
+  } else {
+    toast('Text not found');
+  }
+};
+$('#repAllBtn').onclick = () => {
+  const needle = $('#findIn').value;
+  if (!needle) return;
+  const rep = $('#repIn').value;
+  const parts = codeInput.value.split(needle);
+  if (parts.length <= 1) { toast('No matches found'); return; }
+  codeInput.value = parts.join(rep);
+  onCodeEdited();
+  toast(`Replaced ${parts.length - 1} occurrence(s)`);
+};
+
+// Mode Switcher Clicks
+$('#modeView').onclick = () => {
+  if (!curUrl && ed.repo) curUrl = siteBase(ed.repo);
+  setWorkspaceMode('view');
+};
+$('#modeEdit').onclick = () => {
+  if (ed.repo && !codeInput.value && !ed.dirty) {
+    openEditorForFile(ed.repo, ed.path || 'index.html');
+  } else {
+    setWorkspaceMode('edit');
+  }
+};
+$('#modePreview').onclick = () => setWorkspaceMode('preview');
+$('#modeSplit').onclick = () => {
+  if (ed.repo && !codeInput.value && !ed.dirty) {
+    openEditorForFile(ed.repo, ed.path || 'index.html');
+  } else {
+    setWorkspaceMode('split');
+  }
+};
+
+// Commit & Push Workflow
+function openCommitDialog() {
+  if (!ed.repo) return;
+  $('#commitPath').value = ed.path;
+  $('#commitMsg').value = `${ed.sha ? 'Update' : 'Create'} ${ed.path} via Pages Hub`;
+  $('#commitHint').textContent = token
+    ? `Target: ${user}/${ed.repo.name} (branch: ${ed.repo.branch}). Note: GitHub Pages usually takes 30–60s to deploy after pushing.`
+    : `No GitHub token added yet. Add a token in Settings to push directly to GitHub, or click "Save Local Draft".`;
+  $('#commitDlg').showModal();
+}
+
+$('#saveCommitBtn').onclick = openCommitDialog;
+$('#bannerCommitBtn').onclick = openCommitDialog;
+$('#commitCancel').onclick = () => $('#commitDlg').close();
+
+$('#saveDraftOnly').onclick = () => {
+  if (!ed.repo) return;
+  const newPath = $('#commitPath').value.trim().replace(/^\/+/, '') || 'index.html';
+  ed.path = newPath;
+  ls.set(draftKey(ed.repo.name, ed.path), codeInput.value);
+  $('#commitDlg').close();
+  render();
+  toast('Saved local draft for ' + ed.path);
+};
+
+$('#pushCommitBtn').onclick = async () => {
+  if (!ed.repo) return;
+  if (!token) {
+    $('#commitDlg').close();
+    toast('Add a GitHub Personal Access Token to push commits');
+    openSettings();
+    return;
+  }
+
+  const targetPath = $('#commitPath').value.trim().replace(/^\/+/, '') || 'index.html';
+  const msg = $('#commitMsg').value.trim() || `Update ${targetPath}`;
+  const btn = $('#pushCommitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Pushing…';
+
+  try {
+    const encodedPath = targetPath.split('/').map(encodeURIComponent).join('/');
+    const endpoint = `/repos/${encodeURIComponent(user)}/${encodeURIComponent(ed.repo.name)}/contents/${encodedPath}`;
+
+    // Ensure we have the latest SHA if path changed or SHA wasn't loaded
+    let shaToUse = targetPath === ed.path ? ed.sha : null;
+    if (!shaToUse) {
+      try {
+        const existing = await api(`${endpoint}?ref=${encodeURIComponent(ed.repo.branch)}`);
+        shaToUse = existing.sha;
+      } catch (err) {
+        if (err.status !== 404) throw err;
+      }
+    }
+
+    const payload = {
+      message: msg,
+      content: b64EncodeUtf8(codeInput.value),
+      branch: ed.repo.branch
+    };
+    if (shaToUse) payload.sha = shaToUse;
+
+    const res = await api(endpoint, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    ls.del(draftKey(ed.repo.name, ed.path));
+    ed.path = targetPath;
+    ed.sha = res.content && res.content.sha ? res.content.sha : shaToUse;
+    ed.remoteCode = codeInput.value;
+    ed.dirty = false;
+    ls.del(draftKey(ed.repo.name, ed.path));
+
+    $('#edFileLabel').textContent = `${ed.repo.name} / ${ed.path} (${ed.repo.branch})`;
+    $('#edStatusLabel').textContent = 'Committed & pushed ✓';
+    $('#commitDlg').close();
+    render();
+    toast('Committed to GitHub!');
+  } catch (e) {
+    toast(e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Commit & Push';
+  }
+};
+
+function hideViewer() {
+  document.body.classList.remove('viewing');
+  if (!wide()) {
+    const f = $('#frame');
+    f.removeAttribute('srcdoc');
+    f.src = 'about:blank';
+  }
+}
+function closeViewer() {
+  if (history.state && history.state.v) history.back();
+  else hideViewer();
+}
+addEventListener('popstate', () => {
+  if (!(history.state && history.state.v)) hideViewer();
+});
+
+function openSettings() {
+  $('#u').value = user;
+  $('#t').value = token;
+  $('#setup').showModal();
+}
+$('#settings').onclick = openSettings;
+$('#cancel').onclick = () => $('#setup').close();
+$('#save').onclick = () => {
+  const u = $('#u').value.trim().replace(/^@/, '');
+  if (!u) return;
+  if (u.toLowerCase() !== user.toLowerCase()) {
+    repos = [];
+    ls.set('ph_repos', '[]');
+  }
+  user = u;
+  token = $('#t').value.trim();
+  ls.set('ph_user', user);
+  ls.set('ph_token', token);
+  $('#setup').close();
+  load(true);
+};
+
+$('#refresh').onclick = () => load(true);
+$('#back').onclick = closeViewer;
+$('#reload').onclick = () => {
+  if (curUrl) {
+    const f = $('#frame');
+    f.removeAttribute('srcdoc');
+    f.src = 'about:blank';
+    setTimeout(() => { f.src = curUrl; }, 50);
+  }
+};
+
+$('#q').addEventListener('input', () => { status(''); render(); });
+$('#clearQ').onclick = () => { $('#q').value = ''; status(''); render(); };
+
+document.querySelectorAll('.pill-btn').forEach(btn => {
+  btn.onclick = () => {
+    filterMode = btn.dataset.filter;
+    ls.set('ph_filter', filterMode);
+    status('');
+    render();
+  };
+});
+
+window.phBack = () => {
+  const cDlg = $('#commitDlg');
+  if (cDlg.open) { cDlg.close(); return true; }
+  const sDlg = $('#setup');
+  if (sDlg.open) { sDlg.close(); return true; }
+  if (document.body.classList.contains('viewing') && !wide()) {
+    hideViewer();
+    return true;
+  }
+  return false;
+};
+
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+render();
+load(false);
+</script>
+</body>
+</html>
