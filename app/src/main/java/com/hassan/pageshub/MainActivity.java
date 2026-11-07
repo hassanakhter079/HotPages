@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
         s.setAllowFileAccess(true);
         s.setAllowContentAccess(true);
 
-        // Native bridge for reliable external browser launching & cache clearing
+        // Native bridge for reliable external browser launching, cache clearing, and status bar tinting
         web.addJavascriptInterface(new Object() {
             @JavascriptInterface
             public void openBrowser(final String url) {
@@ -61,6 +61,18 @@ public class MainActivity extends Activity {
                     web.clearCache(true);
                     CookieManager.getInstance().flush();
                 });
+            }
+
+            @JavascriptInterface
+            public void setStatusBar(final String hexColor) {
+                if (hexColor != null && !hexColor.isEmpty()) {
+                    runOnUiThread(() -> {
+                        try {
+                            getWindow().setStatusBarColor(Color.parseColor(hexColor));
+                        } catch (Exception ignored) {
+                        }
+                    });
+                }
             }
         }, "Android");
 
