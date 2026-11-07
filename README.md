@@ -20,8 +20,8 @@ A lightning-fast, minimalist Android application and WebView container (~29 KB A
 
 ## 📥 Download
 
-Pre-compiled and signed release APKs are available on the [Releases](https://github.com/hassanakhter079/hotpages/releases) page:
-- **[HotPages.apk](https://github.com/hassanakhter079/hotpages/releases/latest/download/HotPages.apk)** (Direct APK download)
+Pre-compiled and signed release APKs are available on the [Releases](https://github.com/hassanakhter079/HotPages/releases) page:
+- **[HotPages.apk](https://github.com/hassanakhter079/HotPages/releases/latest/download/HotPages.apk)** (Direct APK download)
 
 ---
 
