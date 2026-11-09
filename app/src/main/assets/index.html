@@ -8,6 +8,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <title>HotPages</title>
+<script src="https://hassanakhter079.github.io/After-Salah-Zikr/cloud-sync.js" data-app="hotpages"></script>
 <style>
 /* Base / Auto Light Theme (Emerald) */
 :root {
@@ -368,6 +369,79 @@ h1 {
   color: var(--accent);
   border-color: var(--accent);
 }
+.cat-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 2px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.cat-bar::-webkit-scrollbar {
+  display: none;
+}
+.cat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+  user-select: none;
+}
+.cat-pill:hover {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+.cat-pill.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent);
+  font-weight: 700;
+}
+.cat-pill .cat-count {
+  font-size: 0.68rem;
+  padding: 1px 5px;
+  border-radius: 99px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.cat-pill.active .cat-count {
+  background: rgba(13, 116, 107, 0.16);
+  color: var(--accent);
+}
+.cat-manage-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 28px;
+  padding: 0 9px;
+  border-radius: 99px;
+  border: 1px dashed var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.cat-manage-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
 
 #listBody {
   flex: 1;
@@ -483,6 +557,28 @@ ul#repos {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   text-transform: none;
 }
+.badge.cat-badge {
+  background: var(--surface-2);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  padding: 2px 7px;
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: none;
+  transition: all 0.15s;
+  border-radius: 99px;
+}
+.badge.cat-badge:hover {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+.badge.cat-badge.assigned {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent);
+}
 .dot {
   width: 6px;
   height: 6px;
@@ -495,6 +591,39 @@ ul#repos {
   font-size: 0.84rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.note-box {
+  margin-top: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  border: 1px dashed var(--line);
+  color: var(--ink);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.note-box:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.note-icon {
+  font-size: 0.82rem;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+.note-text {
+  flex: 1;
+  white-space: pre-wrap;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -604,6 +733,56 @@ ul#repos {
   font-size: 0.75rem;
   font-weight: 700;
   flex-shrink: 0;
+}
+.file-item {
+  margin-top: 5px;
+}
+.file-cat-btn {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--muted);
+  padding: 5px 8px;
+  font-size: 0.72rem;
+  font-weight: 650;
+  cursor: pointer;
+  flex-shrink: 0;
+  max-width: 110px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.15s;
+}
+.file-cat-btn:hover {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+.file-cat-btn.assigned {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.file-note-box {
+  margin: 3px 6px 4px 10px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--surface-2);
+  border-left: 3px solid var(--accent);
+  color: var(--muted);
+  font-size: 0.74rem;
+  line-height: 1.35;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  transition: all 0.15s;
+}
+.file-note-box:hover {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+.file-note-box .note-text {
+  -webkit-line-clamp: 2;
 }
 
 /* Main Workspace (Viewer + Editor) */
@@ -942,6 +1121,57 @@ dialog input {
   height: 100%;
 }
 
+.cat-chips-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.cat-chip {
+  padding: 5px 12px;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.cat-chip:hover {
+  border-color: var(--accent);
+}
+.cat-chip.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent);
+  font-weight: 700;
+}
+.manage-cat-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  margin-bottom: 6px;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+.manage-cat-del-btn {
+  border: 0;
+  background: transparent;
+  color: var(--err);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  line-height: 1;
+}
+.manage-cat-del-btn:hover {
+  background: var(--err-soft);
+}
+
 /* Toast */
 #toast {
   position: fixed;
@@ -1027,6 +1257,8 @@ dialog input {
         <button class="pill-btn" data-filter="all">All Repos</button>
         <button class="pill-btn" data-filter="drafts">Drafts</button>
       </div>
+
+      <div class="cat-bar" id="catBar" role="tablist" aria-label="Category filter"></div>
     </div>
 
     <div id="listBody">
@@ -1159,7 +1391,7 @@ dialog input {
   </p>
   <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between">
     <div>
-      <div style="font-weight:600;font-size:0.9rem">HotPages <span id="appVerBadge" style="color:var(--accent)">v1.0.6</span></div>
+      <div style="font-weight:600;font-size:0.9rem">HotPages <span id="appVerBadge" style="color:var(--accent)">v1.0.7</span></div>
       <div style="font-size:0.8rem;color:var(--muted)" id="updateStatusText">Checks GitHub for new APK updates</div>
     </div>
     <button type="button" id="checkUpdateBtn" style="font-size:0.85rem;padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface)">Check Updates</button>
@@ -1198,6 +1430,53 @@ dialog input {
   </div>
 </dialog>
 
+<!-- CATEGORY & PERSONAL NOTE DIALOG -->
+<dialog id="catDlg">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+    <h2 id="catDlgTitle" style="margin:0;font-size:1.15rem">Category &amp; Note</h2>
+    <span id="catDlgType" style="font-size:0.75rem;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--surface-2);color:var(--muted)">Repo</span>
+  </div>
+  <div id="catDlgTarget" style="font-size:0.84rem;color:var(--accent);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;margin-bottom:12px"></div>
+
+  <label style="margin-top:8px;display:block">Category
+    <div id="catChips" class="cat-chips-grid"></div>
+  </label>
+
+  <div class="cat-add-inline" style="display:flex;gap:6px;margin:8px 0 14px">
+    <input id="catNewInput" placeholder="+ New Category…" style="height:36px;font-size:0.84rem;padding:0 10px;border-radius:8px;margin:0">
+    <button type="button" id="catAddBtn" class="sym-btn" style="height:36px;padding:0 12px;font-size:0.8rem;border-radius:8px;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent);font-weight:700">+ Add</button>
+  </div>
+
+  <label style="margin-top:10px;display:block">Personal Note
+    <textarea id="catNoteInput" rows="4" placeholder="Write private notes, clinical tags, ideas, or reminders…" style="width:100%;margin-top:6px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--ink);font-family:inherit;font-size:0.86rem;resize:vertical;min-height:90px;box-sizing:border-box"></textarea>
+  </label>
+
+  <div class="acts" style="display:flex;justify-content:space-between;align-items:center;margin-top:18px">
+    <button type="button" id="catClearBtn" style="color:var(--err);background:var(--err-soft);border:1px solid var(--err)">Clear</button>
+    <div style="display:flex;gap:8px">
+      <button type="button" id="catCancelBtn">Cancel</button>
+      <button type="button" id="catSaveBtn" class="primary">Save</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- MANAGE CATEGORIES DIALOG -->
+<dialog id="manageCatsDlg">
+  <h2>Manage Categories</h2>
+  <p class="hint">Create or remove categories used to organize your repositories and HTML files.</p>
+  
+  <div class="cat-add-inline" style="display:flex;gap:6px;margin:12px 0">
+    <input id="manageCatNewInput" placeholder="New category name…" style="height:38px;font-size:0.85rem;padding:0 12px;border-radius:8px;margin:0">
+    <button type="button" id="manageCatAddBtn" class="primary" style="height:38px;padding:0 14px;font-size:0.82rem;border-radius:8px;white-space:nowrap">+ Add</button>
+  </div>
+
+  <ul id="manageCatList" class="manage-cat-list" style="list-style:none;margin:12px 0;padding:0;max-height:220px;overflow-y:auto"></ul>
+
+  <div class="acts" style="display:flex;justify-content:flex-end;margin-top:16px">
+    <button type="button" id="manageCatsDoneBtn" class="primary">Done</button>
+  </div>
+</dialog>
+
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -1226,6 +1505,82 @@ let sortMode = ls.get('ph_sort') || 'freq'; // 'freq' (Most Frequently Used) | '
 let repos = [];
 let usageMap = {};
 let filterMode = ls.get('ph_filter') || 'pages';
+
+const DEFAULT_CATS = ['Notes', 'Tools', 'Projects', 'Others'];
+let categories = DEFAULT_CATS.slice();
+try {
+  const savedCats = JSON.parse(ls.get('ph_cats'));
+  if (Array.isArray(savedCats) && savedCats.length) categories = savedCats;
+} catch (e) {}
+
+let catMeta = {};
+try {
+  catMeta = JSON.parse(ls.get('ph_cat_meta') || '{}');
+} catch (e) { catMeta = {}; }
+
+let activeCat = ls.get('ph_active_cat') || 'all';
+
+function saveCategories() {
+  ls.set('ph_cats', JSON.stringify(categories));
+}
+
+function getMeta(key) {
+  return catMeta[key] || { cat: '', note: '', updated: 0 };
+}
+
+function setMeta(key, cat, note) {
+  if (!cat && !note) {
+    delete catMeta[key];
+  } else {
+    catMeta[key] = {
+      cat: cat || '',
+      note: note || '',
+      updated: Date.now()
+    };
+  }
+  ls.set('ph_cat_meta', JSON.stringify(catMeta));
+}
+
+function repoMatchesCategory(rName, targetCat) {
+  if (targetCat === 'all') return true;
+  const rMeta = getMeta('repo:' + rName);
+  if (targetCat === 'uncat') {
+    if (rMeta.cat) return false;
+    const prefix = `file:${rName}/`;
+    for (const k in catMeta) {
+      if (k.startsWith(prefix) && catMeta[k] && catMeta[k].cat) return false;
+    }
+    return true;
+  }
+  if (rMeta.cat === targetCat) return true;
+  const prefix = `file:${rName}/`;
+  for (const k in catMeta) {
+    if (k.startsWith(prefix) && catMeta[k] && catMeta[k].cat === targetCat) return true;
+  }
+  return false;
+}
+
+function repoMatchesQuery(r, q) {
+  if (!q) return true;
+  if (r.name.toLowerCase().includes(q)) return true;
+  if (r.desc && r.desc.toLowerCase().includes(q)) return true;
+  const rMeta = getMeta('repo:' + r.name);
+  if (rMeta.cat && rMeta.cat.toLowerCase().includes(q)) return true;
+  if (rMeta.note && rMeta.note.toLowerCase().includes(q)) return true;
+  const prefix = `file:${r.name}/`;
+  for (const k in catMeta) {
+    if (k.startsWith(prefix)) {
+      const fm = catMeta[k];
+      if (fm) {
+        if (fm.cat && fm.cat.toLowerCase().includes(q)) return true;
+        if (fm.note && fm.note.toLowerCase().includes(q)) return true;
+      }
+    }
+  }
+  return false;
+}
+
+const expandedRepos = new Set();
 let activeKey = '';
 let curUrl = '';
 let viewMode = 'view';
@@ -1424,9 +1779,153 @@ async function load(force) {
   render();
 }
 
+function renderCatBar() {
+  const bar = $('#catBar');
+  if (!bar) return;
+  bar.textContent = '';
+
+  const baseList = repos.filter(r => {
+    if (filterMode === 'pages' && !r.pages) return false;
+    if (filterMode === 'drafts' && !hasRepoDraft(r.name)) return false;
+    return true;
+  });
+
+  // All pill
+  const allCount = baseList.length;
+  const allPill = el('button', {
+    type: 'button',
+    class: 'cat-pill' + (activeCat === 'all' ? ' active' : ''),
+    onclick: () => selectCategory('all')
+  }, el('span', {}, 'All'), el('span', { class: 'cat-count' }, String(allCount)));
+  bar.append(allPill);
+
+  // Dynamic category pills
+  categories.forEach(c => {
+    const count = baseList.filter(r => repoMatchesCategory(r.name, c)).length;
+    const pill = el('button', {
+      type: 'button',
+      class: 'cat-pill' + (activeCat === c ? ' active' : ''),
+      onclick: () => selectCategory(c)
+    }, el('span', {}, c), el('span', { class: 'cat-count' }, String(count)));
+    bar.append(pill);
+  });
+
+  // Uncategorized pill
+  const uncatCount = baseList.filter(r => repoMatchesCategory(r.name, 'uncat')).length;
+  const uncatPill = el('button', {
+    type: 'button',
+    class: 'cat-pill' + (activeCat === 'uncat' ? ' active' : ''),
+    onclick: () => selectCategory('uncat')
+  }, el('span', {}, 'Uncategorized'), el('span', { class: 'cat-count' }, String(uncatCount)));
+  bar.append(uncatPill);
+
+  // + Manage button
+  const manageBtn = el('button', {
+    type: 'button',
+    class: 'cat-manage-btn',
+    title: 'Manage categories',
+    onclick: openManageCatsDlg
+  }, '+ Manage');
+  bar.append(manageBtn);
+}
+
+function selectCategory(cat) {
+  activeCat = cat;
+  ls.set('ph_active_cat', activeCat);
+  renderCatBar();
+  render();
+}
+
+let activeCatTargetKey = '';
+let selectedCatForDlg = '';
+
+function openCatDlg(targetKey, displayName, typeLabel) {
+  activeCatTargetKey = targetKey;
+  const meta = getMeta(targetKey);
+  selectedCatForDlg = meta.cat || '';
+  
+  $('#catDlgTitle').textContent = typeLabel === 'Repository' ? 'Repository Note & Category' : 'HTML File Note & Category';
+  $('#catDlgType').textContent = typeLabel;
+  $('#catDlgTarget').textContent = displayName;
+  $('#catNoteInput').value = meta.note || '';
+  $('#catNewInput').value = '';
+
+  renderCatChips();
+  $('#catDlg').showModal();
+}
+
+function renderCatChips() {
+  const container = $('#catChips');
+  if (!container) return;
+  container.textContent = '';
+
+  const noneChip = el('button', {
+    type: 'button',
+    class: 'cat-chip' + (selectedCatForDlg === '' ? ' active' : ''),
+    onclick: () => { selectedCatForDlg = ''; renderCatChips(); }
+  }, 'None');
+  container.append(noneChip);
+
+  categories.forEach(c => {
+    const chip = el('button', {
+      type: 'button',
+      class: 'cat-chip' + (selectedCatForDlg === c ? ' active' : ''),
+      onclick: () => { selectedCatForDlg = c; renderCatChips(); }
+    }, c);
+    container.append(chip);
+  });
+}
+
+function openManageCatsDlg() {
+  renderManageCatList();
+  $('#manageCatNewInput').value = '';
+  $('#manageCatsDlg').showModal();
+}
+
+function renderManageCatList() {
+  const ul = $('#manageCatList');
+  if (!ul) return;
+  ul.textContent = '';
+  categories.forEach(c => {
+    const li = el('li', {},
+      el('span', {}, c),
+      el('button', {
+        type: 'button',
+        class: 'manage-cat-del-btn',
+        title: `Delete category "${c}"`,
+        onclick: () => deleteCategory(c)
+      }, '✕')
+    );
+    ul.append(li);
+  });
+}
+
+function deleteCategory(c) {
+  if (!confirm(`Delete category "${c}"? Items using this category will become uncategorized.`)) return;
+  categories = categories.filter(x => x !== c);
+  if (!categories.length) categories = DEFAULT_CATS.slice();
+  saveCategories();
+  for (const k in catMeta) {
+    if (catMeta[k] && catMeta[k].cat === c) {
+      catMeta[k].cat = '';
+      if (!catMeta[k].note) delete catMeta[k];
+    }
+  }
+  ls.set('ph_cat_meta', JSON.stringify(catMeta));
+  if (activeCat === c) {
+    activeCat = 'all';
+    ls.set('ph_active_cat', activeCat);
+  }
+  renderManageCatList();
+  renderCatBar();
+  render();
+  toast(`Deleted category "${c}"`);
+}
+
 function render() {
   $('#userBadge').textContent = '@' + user;
   updateFilterUI();
+  renderCatBar();
   const q = $('#q').value.trim().toLowerCase();
   $('#clearQ').hidden = !q;
 
@@ -1434,7 +1933,8 @@ function render() {
   const list = repos.filter(r => {
     if (filterMode === 'pages' && !r.pages) return false;
     if (filterMode === 'drafts' && !hasRepoDraft(r.name)) return false;
-    if (q && !r.name.toLowerCase().includes(q) && !r.desc.toLowerCase().includes(q)) return false;
+    if (activeCat !== 'all' && !repoMatchesCategory(r.name, activeCat)) return false;
+    if (q && !repoMatchesQuery(r, q)) return false;
     return true;
   });
 
@@ -1458,6 +1958,8 @@ function render() {
         ? 'No saved local HTML drafts yet. Edit any HTML file to create one.'
         : filterMode === 'pages'
         ? 'No GitHub Pages sites match. Switch to “All Repos” to browse or edit everything.'
+        : activeCat !== 'all'
+        ? `No repositories found in category “${activeCat}”.`
         : 'No repositories match your search.'
     );
   }
@@ -1468,7 +1970,21 @@ function render() {
     const box = el('div', { class: 'filelist', hidden: '' });
     const repoUrl = siteBase(r);
 
+    const repoKey = 'repo:' + r.name;
+    const rMeta = getMeta(repoKey);
+
+    const catBadge = el('button', {
+      type: 'button',
+      class: 'badge cat-badge' + (rMeta.cat ? ' assigned' : ''),
+      title: rMeta.cat ? `Category: ${rMeta.cat} (Click to edit)` : 'Categorize & add personal note',
+      onclick: (e) => {
+        e.stopPropagation();
+        openCatDlg(repoKey, r.name, 'Repository');
+      }
+    }, rMeta.cat ? `🏷️ ${rMeta.cat}` : '+ Category');
+
     const badges = el('div', { class: 'badges' },
+      catBadge,
       usage.count > 0 ? el('span', { class: 'badge freq', title: `Opened ${usage.count} time(s)` }, `★ ${usage.count}x`) : '',
       hasDraft ? el('span', { class: 'badge draft' }, 'Draft') : '',
       r.pages
@@ -1476,9 +1992,19 @@ function render() {
         : el('span', { class: 'badge off' }, 'No Pages')
     );
 
+    const noteBox = rMeta.note ? el('div', {
+      class: 'note-box',
+      title: 'Click to edit personal note',
+      onclick: (e) => {
+        e.stopPropagation();
+        openCatDlg(repoKey, r.name, 'Repository');
+      }
+    }, el('span', { class: 'note-icon' }, '📝'), el('span', { class: 'note-text' }, rMeta.note)) : '';
+
     const cardMain = el('div', { class: 'card-main' },
       el('div', { class: 'card-top' }, el('div', { class: 'name' }, r.name), badges),
       r.desc ? el('div', { class: 'desc' }, r.desc) : '',
+      noteBox,
       el('div', { class: 'meta' },
         el('span', { class: 'branch-tag' }, r.branch),
         el('span', {}, 'Updated ' + fmt(r.pushed))
@@ -1515,12 +2041,18 @@ function render() {
         'data-key': r.name
       }, cardMain, actions, box)
     );
+
+    if (expandedRepos.has(r.name)) {
+      toggleFiles(r, box);
+    }
   });
 }
 
 async function toggleFiles(r, box) {
   if (box.dataset.loaded) {
     box.hidden = !box.hidden;
+    if (box.hidden) expandedRepos.delete(r.name);
+    else expandedRepos.add(r.name);
     return;
   }
   box.hidden = false;
@@ -1546,24 +2078,59 @@ async function toggleFiles(r, box) {
     hs.forEach(x => {
       const fUrl = siteBase(r) + x.path.split('/').map(encodeURIComponent).join('/');
       const isDraft = !!ls.get(draftKey(r.name, x.path));
+      const fileKey = `file:${r.name}/${x.path}`;
+      const fMeta = getMeta(fileKey);
+
+      const fileOpenBtn = el('button', {
+        class: 'file-open',
+        onclick: () => r.pages ? openPage(r, x.path, fUrl, r.name + '/' + x.path) : openEditorForFile(r, x.path)
+      }, x.path + (isDraft ? ' (draft)' : ''));
+
+      const fileCatBtn = el('button', {
+        type: 'button',
+        class: 'file-cat-btn' + (fMeta.cat ? ' assigned' : ''),
+        title: fMeta.cat ? `Category: ${fMeta.cat}` : 'Assign Category & Personal Note',
+        onclick: (e) => {
+          e.stopPropagation();
+          openCatDlg(fileKey, `${r.name} / ${x.path}`, 'HTML File');
+        }
+      }, fMeta.cat ? `🏷️ ${fMeta.cat}` : '🏷️');
+
+      const fileExtBtn = r.pages ? el('button', {
+        class: 'file-ext-btn',
+        title: 'Open in external browser',
+        onclick: () => launchExternalBrowser(fUrl, r.name)
+      }, '↗') : '';
+
+      const fileEditBtn = el('button', {
+        class: 'file-edit-btn',
+        onclick: () => openEditorForFile(r, x.path)
+      }, 'Edit </>');
+
       const row = el('div', { class: 'file-row' },
-        el('button', {
-          class: 'file-open',
-          onclick: () => r.pages ? openPage(r, x.path, fUrl, r.name + '/' + x.path) : openEditorForFile(r, x.path)
-        }, x.path + (isDraft ? ' (draft)' : '')),
-        r.pages ? el('button', {
-          class: 'file-ext-btn',
-          title: 'Open in external browser',
-          onclick: () => launchExternalBrowser(fUrl, r.name)
-        }, '↗') : '',
-        el('button', {
-          class: 'file-edit-btn',
-          onclick: () => openEditorForFile(r, x.path)
-        }, 'Edit </>')
+        fileOpenBtn,
+        fileCatBtn,
+        fileExtBtn,
+        fileEditBtn
       );
-      box.append(row);
+
+      const itemChildren = [row];
+      if (fMeta.note) {
+        const noteEl = el('div', {
+          class: 'file-note-box',
+          title: 'Click to edit personal note',
+          onclick: (e) => {
+            e.stopPropagation();
+            openCatDlg(fileKey, `${r.name} / ${x.path}`, 'HTML File');
+          }
+        }, el('span', { class: 'note-icon' }, '📝'), el('span', { class: 'note-text' }, fMeta.note));
+        itemChildren.push(noteEl);
+      }
+
+      box.append(el('div', { class: 'file-item' }, ...itemChildren));
     });
     box.dataset.loaded = '1';
+    expandedRepos.add(r.name);
   } catch (e) {
     box.textContent = e.message;
   }
@@ -2113,7 +2680,80 @@ document.querySelectorAll('.pill-btn').forEach(btn => {
   };
 });
 
+// Category Dialog Event Handlers
+$('#catAddBtn').onclick = () => {
+  const input = $('#catNewInput');
+  const val = input.value.trim();
+  if (!val) return;
+  if (!categories.includes(val)) {
+    categories.push(val);
+    saveCategories();
+  }
+  selectedCatForDlg = val;
+  input.value = '';
+  renderCatChips();
+  renderCatBar();
+};
+
+$('#catNewInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    $('#catAddBtn').click();
+  }
+});
+
+$('#catSaveBtn').onclick = () => {
+  const noteVal = $('#catNoteInput').value.trim();
+  setMeta(activeCatTargetKey, selectedCatForDlg, noteVal);
+  $('#catDlg').close();
+  renderCatBar();
+  render();
+  toast('Saved category & note');
+};
+
+$('#catClearBtn').onclick = () => {
+  setMeta(activeCatTargetKey, '', '');
+  $('#catDlg').close();
+  renderCatBar();
+  render();
+  toast('Cleared category & note');
+};
+
+$('#catCancelBtn').onclick = () => {
+  $('#catDlg').close();
+};
+
+// Manage Categories Dialog Event Handlers
+$('#manageCatAddBtn').onclick = () => {
+  const input = $('#manageCatNewInput');
+  const val = input.value.trim();
+  if (!val) return;
+  if (!categories.includes(val)) {
+    categories.push(val);
+    saveCategories();
+    renderManageCatList();
+    renderCatBar();
+    toast(`Added category "${val}"`);
+  }
+  input.value = '';
+};
+
+$('#manageCatNewInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    $('#manageCatAddBtn').click();
+  }
+});
+
+$('#manageCatsDoneBtn').onclick = () => {
+  $('#manageCatsDlg').close();
+};
+
 window.phBack = () => {
+  const mDlg = $('#manageCatsDlg');
+  if (mDlg && mDlg.open) { mDlg.close(); return true; }
+  const catDlg = $('#catDlg');
+  if (catDlg && catDlg.open) { catDlg.close(); return true; }
   const tDlg = $('#themeDlg');
   if (tDlg && tDlg.open) { tDlg.close(); return true; }
   const uDlg = $('#updateDlg');
@@ -2135,7 +2775,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
 
 
 // --- AUTO-UPDATE LOGIC ---
-const APP_VERSION = 'v1.0.6';
+const APP_VERSION = 'v1.0.7';
 const UPDATE_REPO = 'hassanakhter079/HotPages';
 
 function escText(s) {
