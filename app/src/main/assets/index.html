@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <title>HotPages</title>
-<script src="https://hassanakhter079.github.io/After-Salah-Zikr/cloud-sync.js" data-app="hotpages"></script>
+<script defer src="https://hassanakhter079.github.io/After-Salah-Zikr/cloud-sync.js" data-app="hotpages"></script>
 <style>
 /* Base / Auto Light Theme (Emerald) */
 :root {
@@ -884,7 +884,34 @@ ul#repos {
   flex-direction: column;
   min-width: 0;
   height: 100%;
+  position: relative;
+  overflow: hidden;
   background: #fff;
+}
+#frameLoader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--surface-2);
+  z-index: 5;
+  overflow: hidden;
+}
+#frameLoader::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: var(--accent);
+  animation: frameLoading 1.2s infinite ease-in-out;
+}
+@keyframes frameLoading {
+  0% { left: -40%; width: 30%; }
+  50% { left: 30%; width: 50%; }
+  100% { left: 100%; width: 40%; }
 }
 #previewBanner {
   background: var(--warn-soft);
@@ -901,8 +928,11 @@ ul#repos {
 #frame {
   flex: 1;
   width: 100%;
+  height: 100%;
+  min-height: 0;
   border: 0;
   background: #fff;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Built-in HTML Code Editor */
@@ -1215,7 +1245,7 @@ dialog input {
   #modeSplit { display: none; }
 }
 @media (min-width: 900px) {
-  #back { display: none; }
+  body:not(.viewing) #back { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
@@ -1342,6 +1372,7 @@ dialog input {
 
       <!-- LIVE / DRAFT PREVIEW PANE -->
       <section id="frameWrap" hidden>
+        <div id="frameLoader" hidden></div>
         <div id="previewBanner" hidden>
           <span>Instant Local Preview (Unsaved Edits)</span>
           <button class="new-file-btn" id="bannerCommitBtn">Commit to GitHub</button>
@@ -1391,7 +1422,7 @@ dialog input {
   </p>
   <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between">
     <div>
-      <div style="font-weight:600;font-size:0.9rem">HotPages <span id="appVerBadge" style="color:var(--accent)">v1.0.7</span></div>
+      <div style="font-weight:600;font-size:0.9rem">HotPages <span id="appVerBadge" style="color:var(--accent)">v1.0.8</span></div>
       <div style="font-size:0.8rem;color:var(--muted)" id="updateStatusText">Checks GitHub for new APK updates</div>
     </div>
     <button type="button" id="checkUpdateBtn" style="font-size:0.85rem;padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface)">Check Updates</button>
@@ -1707,20 +1738,37 @@ function hasRepoDraft(rName) {
 async function api(path, opts = {}) {
   const h = { Accept: 'application/vnd.github+json', ...(opts.headers || {}) };
   if (token) h.Authorization = 'Bearer ' + token;
-  const r = await fetch('https://api.github.com' + path, { cache: 'no-store', ...opts, headers: h });
-  if (!r.ok) {
-    let detail = '';
-    try { const j = await r.json(); detail = j.message || ''; } catch (e) {}
-    if (r.status === 403 || r.status === 429) throw new Error('GitHub rate limit or permission error. Add/check your token in settings.');
-    if (r.status === 404) {
-      const err = new Error(detail || 'Resource not found (404).');
-      err.status = 404;
-      throw err;
+  const timeoutMs = opts.timeout || 15000;
+  const controller = new AbortController();
+  const tId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const r = await fetch('https://api.github.com' + path, {
+      cache: 'no-store',
+      ...opts,
+      headers: h,
+      signal: controller.signal
+    });
+    clearTimeout(tId);
+    if (!r.ok) {
+      let detail = '';
+      try { const j = await r.json(); detail = j.message || ''; } catch (e) {}
+      if (r.status === 403 || r.status === 429) throw new Error('GitHub rate limit or permission error. Add/check your token in settings.');
+      if (r.status === 404) {
+        const err = new Error(detail || 'Resource not found (404).');
+        err.status = 404;
+        throw err;
+      }
+      if (r.status === 401) throw new Error('GitHub token rejected. Check it in settings.');
+      throw new Error(detail || 'GitHub error ' + r.status + '.');
     }
-    if (r.status === 401) throw new Error('GitHub token rejected. Check it in settings.');
-    throw new Error(detail || 'GitHub error ' + r.status + '.');
+    return r.json();
+  } catch (err) {
+    clearTimeout(tId);
+    if (err.name === 'AbortError') {
+      throw new Error('Connection to GitHub timed out. Check your network.');
+    }
+    throw err;
   }
-  return r.json();
 }
 
 function status(msg, err) {
@@ -2160,6 +2208,24 @@ function enterWorkspace() {
   }
 }
 
+let frameLoadTimer = null;
+function loadFrameUrl(url) {
+  if (!url) return;
+  const f = $('#frame');
+  const loader = $('#frameLoader');
+  if (loader) loader.hidden = false;
+  f.removeAttribute('srcdoc');
+  f.src = url;
+
+  clearTimeout(frameLoadTimer);
+  frameLoadTimer = setTimeout(() => {
+    if (loader && !loader.hidden) {
+      loader.hidden = true;
+      toast('Taking a while to load. Tap "Open in Browser ↗" if connection is slow.');
+    }
+  }, 12000);
+}
+
 function setWorkspaceMode(mode) {
   viewMode = mode;
   $('#modeView').classList.toggle('active', mode === 'view');
@@ -2181,9 +2247,8 @@ function setWorkspaceMode(mode) {
   } else if (mode === 'view') {
     $('#previewBanner').hidden = true;
     const f = $('#frame');
-    f.removeAttribute('srcdoc');
-    if (curUrl && f.getAttribute('src') !== curUrl) {
-      f.src = curUrl;
+    if (curUrl && f.getAttribute('src') !== curUrl && !f.hasAttribute('srcdoc')) {
+      loadFrameUrl(curUrl);
     }
   }
 }
@@ -2200,10 +2265,8 @@ function openPage(repoObj, filePath, url, title) {
   $('#vt').textContent = title;
   $('#vsub').textContent = url;
 
-  const f = $('#frame');
-  f.removeAttribute('srcdoc');
-  f.src = url;
   setWorkspaceMode('view');
+  loadFrameUrl(url);
 }
 
 function starterHtmlTemplate(repoName, filePath) {
@@ -2303,39 +2366,50 @@ async function openEditorForFile(repoObj, filePath, forceNew = false) {
 
 function renderInstantPreview() {
   const f = $('#frame');
+  const loader = $('#frameLoader');
+  if (loader) loader.hidden = true;
   $('#previewBanner').hidden = false;
-  let html = $('#codeInput').value;
+  let html = $('#codeInput').value || '';
 
   const storageShim = `<script>
 (function(){
   try {
-    var t = '__ph_test__';
+    var t = '__ph_test__' + Math.random();
     window.localStorage.setItem(t, t);
     window.localStorage.removeItem(t);
   } catch (e) {
-    var pfx = 'ph_app_ls_${ed.repo ? ed.repo.name.replace(/[^a-zA-Z0-9_-]/g, '_') : 'default'}_';
     var mem = {};
-    var pStore = null;
-    try { pStore = window.parent && window.parent.localStorage; } catch (err) {}
     var fakeLS = {
       getItem: function(k) {
-        try { if (pStore) return pStore.getItem(pfx + k); } catch(err){}
         return Object.prototype.hasOwnProperty.call(mem, k) ? mem[k] : null;
       },
       setItem: function(k, v) {
         mem[k] = String(v);
-        try { if (pStore) pStore.setItem(pfx + k, String(v)); } catch(err){}
       },
       removeItem: function(k) {
         delete mem[k];
-        try { if (pStore) pStore.removeItem(pfx + k); } catch(err){}
       },
-      clear: function() { mem = {}; }
+      clear: function() {
+        mem = {};
+      },
+      key: function(i) {
+        var keys = Object.keys(mem);
+        return i >= 0 && i < keys.length ? keys[i] : null;
+      },
+      get length() {
+        return Object.keys(mem).length;
+      }
     };
     try {
-      Object.defineProperty(window, 'localStorage', { value: fakeLS, configurable: true });
-      Object.defineProperty(window, 'sessionStorage', { value: fakeLS, configurable: true });
-    } catch (err) {}
+      var proto = Object.getPrototypeOf(window);
+      Object.defineProperty(proto, 'localStorage', { get: function() { return fakeLS; }, configurable: true });
+      Object.defineProperty(proto, 'sessionStorage', { get: function() { return fakeLS; }, configurable: true });
+    } catch (e1) {
+      try {
+        Object.defineProperty(window, 'localStorage', { value: fakeLS, writable: true, configurable: true });
+        Object.defineProperty(window, 'sessionStorage', { value: fakeLS, writable: true, configurable: true });
+      } catch (e2) {}
+    }
   }
 })();
 <\/script>`;
@@ -2348,17 +2422,23 @@ function renderInstantPreview() {
     const headExtras = (!/<base\s/i.test(html) ? `<base href="${baseHref}">` : '') + storageShim;
 
     if (/<head[^>]*>/i.test(html)) {
-      html = html.replace(/(<head[^>]*>)/i, `$1${headExtras}`);
+      html = html.replace(/(<head[^>]*>)/i, (m) => m + headExtras);
     } else {
       html = headExtras + html;
     }
   }
+  f.removeAttribute('src');
   f.srcdoc = html;
 }
+
+let draftSaveTimer = null;
+let lastLineCount = 0;
 
 function updateLineNumbers() {
   const code = $('#codeInput').value;
   const count = (code.match(/\n/g) || []).length + 1;
+  if (count === lastLineCount) return;
+  lastLineCount = count;
   let out = '';
   for (let i = 1; i <= count; i++) out += i + '\n';
   $('#lineNums').textContent = out;
@@ -2370,15 +2450,20 @@ function onCodeEdited() {
   const val = $('#codeInput').value;
   ed.dirty = val !== ed.remoteCode;
   if (ed.dirty) {
-    ls.set(draftKey(ed.repo.name, ed.path), val);
-    $('#edStatusLabel').textContent = 'Draft saved locally ●';
+    $('#edStatusLabel').textContent = 'Draft (saving…) ●';
+    clearTimeout(draftSaveTimer);
+    draftSaveTimer = setTimeout(() => {
+      ls.set(draftKey(ed.repo.name, ed.path), val);
+      $('#edStatusLabel').textContent = 'Draft saved locally ●';
+    }, 400);
   } else {
+    clearTimeout(draftSaveTimer);
     ls.del(draftKey(ed.repo.name, ed.path));
     $('#edStatusLabel').textContent = 'No changes';
   }
   if (viewMode === 'split') {
     clearTimeout(onCodeEdited.t);
-    onCodeEdited.t = setTimeout(renderInstantPreview, 250);
+    onCodeEdited.t = setTimeout(renderInstantPreview, 350);
   }
 }
 
@@ -2596,15 +2681,34 @@ $('#pushCommitBtn').onclick = async () => {
 
 function hideViewer() {
   document.body.classList.remove('viewing');
-  if (!wide()) {
-    const f = $('#frame');
+  const f = $('#frame');
+  if (f) {
     f.removeAttribute('srcdoc');
     f.src = 'about:blank';
   }
+  const loader = $('#frameLoader');
+  if (loader) loader.hidden = true;
+  clearTimeout(frameLoadTimer);
+
+  if (wide()) {
+    $('#empty').hidden = false;
+    $('#modeSwitch').hidden = true;
+    $('#editorPane').hidden = true;
+    $('#frameWrap').hidden = true;
+    $('#saveCommitBtn').hidden = true;
+    $('#reload').hidden = true;
+    $('#extBtn').hidden = true;
+    $('#vt').textContent = 'HotPages';
+    $('#vsub').textContent = 'Select a repository or HTML file';
+    setActiveRepoCard('');
+  }
 }
 function closeViewer() {
-  if (history.state && history.state.v) history.back();
-  else hideViewer();
+  if (!wide() && history.state && history.state.v) {
+    history.back();
+  } else {
+    hideViewer();
+  }
 }
 addEventListener('popstate', () => {
   if (!(history.state && history.state.v)) hideViewer();
@@ -2762,8 +2866,8 @@ window.phBack = () => {
   if (cDlg && cDlg.open) { cDlg.close(); return true; }
   const sDlg = $('#setup');
   if (sDlg && sDlg.open) { sDlg.close(); return true; }
-  if (document.body.classList.contains('viewing') && !wide()) {
-    hideViewer();
+  if (document.body.classList.contains('viewing')) {
+    closeViewer();
     return true;
   }
   return false;
@@ -2774,8 +2878,23 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
 }
 
 
+const frameEl = $('#frame');
+if (frameEl) {
+  frameEl.addEventListener('load', () => {
+    const loader = $('#frameLoader');
+    if (loader) loader.hidden = true;
+    clearTimeout(frameLoadTimer);
+  });
+  frameEl.addEventListener('error', () => {
+    const loader = $('#frameLoader');
+    if (loader) loader.hidden = true;
+    clearTimeout(frameLoadTimer);
+    toast('Could not load page in app. Try opening in external browser.');
+  });
+}
+
 // --- AUTO-UPDATE LOGIC ---
-const APP_VERSION = 'v1.0.7';
+const APP_VERSION = 'v1.0.8';
 const UPDATE_REPO = 'hassanakhter079/HotPages';
 
 function escText(s) {

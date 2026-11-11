@@ -45,6 +45,8 @@ public class MainActivity extends Activity {
         s.setMediaPlaybackRequiresUserGesture(false);
         s.setAllowFileAccess(true);
         s.setAllowContentAccess(true);
+        s.setAllowFileAccessFromFileURLs(true);
+        s.setAllowUniversalAccessFromFileURLs(true);
 
         // Native bridge for reliable external browser launching, cache clearing, and status bar tinting
         web.addJavascriptInterface(new Object() {
